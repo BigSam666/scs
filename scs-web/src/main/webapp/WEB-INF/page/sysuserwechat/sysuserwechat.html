@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>用户与微信对应关系(只与管理员有关)</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("sysuserwechat:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("sysuserwechat:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("sysuserwechat:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+										<div class="form-group">
+			   	<div class="col-sm-2 control-label">用户ID</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="sysUserWechat.userid" name="userid" placeholder="用户ID"/>
+			    </div>
+			</div>
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">微信ID</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="sysUserWechat.wechatid" name="wechatid" placeholder="微信ID"/>
+			    </div>
+			</div>
+																							#if($shiro.hasPermission("sysuserwechat:update") || $shiro.hasPermission("sysuserwechat:save"))
+			<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+			#end
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sysuserwechat/sysuserwechat.js?_${date.systemTime}"></script>
+</body>
+</html>

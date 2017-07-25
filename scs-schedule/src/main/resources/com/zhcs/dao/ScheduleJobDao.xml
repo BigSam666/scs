@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.ScheduleJobDao">
+	<select id="queryObject" resultType="com.zhcs.entity.ScheduleJobEntity" >
+		select
+			id,
+			bnm,
+			mnm,
+			params,
+			cronexp,
+			status,
+			rmk,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from schedule_job where id = #{value}
+	</select> 
+
+	<select id="queryList" resultType="com.zhcs.entity.ScheduleJobEntity" >
+		select
+			id,
+			bnm,
+			mnm,
+			params,
+			cronexp,
+			status,
+			rmk,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from schedule_job
+		<where>
+			<if test="bnm != null and bnm.trim() != ''">
+				bnm like concat('%', #{bnm}, '%') 
+			</if>
+		</where>
+		<if test="offset != null and limit != null ">
+		limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(1) from schedule_job 
+		<where>
+			<if test="bnm != null and bnm.trim() != ''">
+				bnm like concat('%', #{bnm}, '%') 
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.ScheduleJobEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into schedule_job
+		(
+			`bnm`, 
+			`mnm`, 
+			`params`, 
+			`cronexp`, 
+			`status`, 
+			`rmk`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{bnm}, 
+			#{mnm}, 
+			#{params}, 
+			#{cronexp}, 
+			#{status}, 
+			#{rmk}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.ScheduleJobEntity">
+		update schedule_job 
+		<set> 
+			<if test="bnm != null">`bnm` = #{bnm}, </if>
+			<if test="mnm != null">`mnm` = #{mnm}, </if>
+			<if test="params != null">`params` = #{params}, </if>
+			<if test="cronexp != null">`cronexp` = #{cronexp}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="rmk != null">`rmk` = #{rmk}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 批量更新状态 -->
+	<update id="updateBatch"> 
+		update schedule_job set status = #{status} where id in 
+		<foreach item="id" collection="list"  open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+	
+	<delete id="deleteBatch">
+		delete from schedule_job where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

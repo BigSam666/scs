@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CallSeatsDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CallSeatsEntity">
+		select
+			id, 		
+			name, 		
+			fphone, 		
+			sex, 		
+			xmper, 		
+			zxno, 		
+			depa, 		
+			phone, 		
+			sid, 		
+			cdate, 		
+			jaddes, 		
+			haddes, 		
+			rtype, 		
+			rem, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from call_seats where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CallSeatsEntity">
+		select
+			id, 		
+			name, 		
+			fphone, 		
+			sex, 		
+			xmper, 		
+			zxno, 		
+			depa, 		
+			phone, 		
+			sid, 		
+			cdate, 		
+			jaddes, 		
+			haddes, 		
+			rtype, 		
+			rem, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from call_seats 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from call_seats 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CallSeatsEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into call_seats
+		(
+			`name`, 
+			`fphone`, 
+			`sex`, 
+			`xmper`, 
+			`zxno`, 
+			`depa`, 
+			`phone`, 
+			`sid`, 
+			`cdate`, 
+			`jaddes`, 
+			`haddes`, 
+			`rtype`, 
+			`rem`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{name}, 
+			#{fphone}, 
+			#{sex}, 
+			#{xmper}, 
+			#{zxno}, 
+			#{depa}, 
+			#{phone}, 
+			#{sid}, 
+			#{cdate}, 
+			#{jaddes}, 
+			#{haddes}, 
+			#{rtype}, 
+			#{rem}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CallSeatsEntity">
+		update call_seats 
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="fphone != null">`fphone` = #{fphone}, </if>
+			<if test="sex != null">`sex` = #{sex}, </if>
+			<if test="xmper != null">`xmper` = #{xmper}, </if>
+			<if test="zxno != null">`zxno` = #{zxno}, </if>
+			<if test="depa != null">`depa` = #{depa}, </if>
+			<if test="phone != null">`phone` = #{phone}, </if>
+			<if test="sid != null">`sid` = #{sid}, </if>
+			<if test="cdate != null">`cdate` = #{cdate}, </if>
+			<if test="jaddes != null">`jaddes` = #{jaddes}, </if>
+			<if test="haddes != null">`haddes` = #{haddes}, </if>
+			<if test="rtype != null">`rtype` = #{rtype}, </if>
+			<if test="rem != null">`rem` = #{rem}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from call_seats where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from call_seats where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

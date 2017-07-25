@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.MsglogDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.MsglogEntity">
+		select
+			id, 		
+			receiver, 		
+			type, 		
+			content, 		
+			tid, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from msglog where id = #{value}
+	</select>
+	
+	<select id="queryObject2" resultType="java.util.Map">
+		select
+			id, 		
+			receiver, 		
+			(select name from sys_user where id = receiver) unm,  	
+			type, 		
+			content, 		
+			tid, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from msglog where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.MsglogEntity">
+		select
+			id, 		
+			receiver, 	
+			type, 		
+			content, 		
+			tid, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from msglog 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListBetweenTime" resultType="com.zhcs.entity.MsglogEntity">
+		select
+			id, 		
+			receiver, 	
+			type, 		
+			content, 		
+			tid, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from msglog 
+		<where>
+			<if test="userId != null">
+				and receiver = #{userId}
+			</if>
+			<if test="btime != null">
+				and crttm &gt; #{btime}
+			</if>
+			<if test="etime != null">
+				and crttm &lt; #{etime}
+			</if>
+			and status = 1
+		</where>
+		order by crttm desc
+	</select>
+
+	<select id="queryList2" resultType="java.util.Map">
+		select
+			id, 		
+			receiver, 	
+			(select name from sys_user where id = receiver) unm,  		
+			type, 		
+			content, 		
+			tid, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from msglog 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from msglog 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.MsglogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into msglog
+		(
+			`receiver`, 
+			`type`, 
+			`content`, 
+			`tid`, 
+			`status`, 
+			`log`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{receiver}, 
+			#{type}, 
+			#{content}, 
+			#{tid}, 
+			#{status}, 
+			#{log}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.MsglogEntity">
+		update msglog 
+		<set>
+			<if test="receiver != null">`receiver` = #{receiver}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="tid != null">`tid` = #{tid}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="log != null">`log` = #{log}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from msglog where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from msglog where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

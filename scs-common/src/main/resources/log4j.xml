@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE log4j:configuration SYSTEM
+		"D:\Users\Alter\workspace\IdeaProjects\scs\scs-common\src\main\resources\log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+	<!-- 控制台日志 -->
+	<appender name="log.console" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="SmartCity.log %d %-5p %c - %m%n" />
+		</layout>
+	</appender>
+
+	<!-- 文件日志，每10MB大小产生一个日志文件 -->
+	<appender name="log.file1" class="org.apache.log4j.RollingFileAppender">
+		<!-- window --> <param name="File" value="../logs/zhaobiao.log" />
+		<!-- linux 
+		<param name="File" value="/home/zhaobiao/software/tomcat-prod/logs/zhcs.log" />-->
+		
+		<param name="Append" value="true" />
+		<param name="Threshold" value="ERROR" />
+		<param name="MaxBackupIndex" value="1" />
+		<param name="MaxFileSize" value="10MB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="SmartCity.log %d %-5p %c - %m%n" />
+		</layout>
+	</appender>
+	
+	<!-- 文件日志，每天产生一个日志文件 -->
+	<appender name="log.file2" class="org.apache.log4j.DailyRollingFileAppender">
+		<!-- window <param name="File" value="../logs/SmartCity.log" /> -->
+		
+		<!-- linux -->
+		<param name="File" value="/home/zhcs/logs/SmartCity.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="SmartCity.log %d %-5p %c - %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="com.zhcs" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="log.console" />
+	</logger>
+	<logger name="com.zhcs.controller.weixin" additivity="false">
+		<level value="info" />
+		<appender-ref ref="log.console" />
+	</logger>
+	<root>
+		<level value="info" />
+		<appender-ref ref="log.console" />
+	</root>
+</log4j:configuration>

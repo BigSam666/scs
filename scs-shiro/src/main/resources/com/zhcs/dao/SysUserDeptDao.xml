@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.SysUserDeptDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.SysUserDeptEntity">
+		select
+			id, 		
+			userid, 		
+			deptid, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sys_user_dept where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.SysUserDeptEntity">
+		select
+			id, 		
+			userid, 		
+			deptid, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sys_user_dept 
+		order by id
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from sys_user_dept 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.SysUserDeptEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_user_dept
+		(
+			`userid`, 
+			`deptid`,
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		<foreach collection="deptIdList" item="item" index="index" separator="," >
+		(
+			#{userid}, 
+			#{item}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+		</foreach>
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.SysUserDeptEntity">
+		update sys_user_dept 
+		<set>
+			<if test="userid != null">`userid` = #{userid}, </if>
+			<if test="deptid != null">`deptid` = #{deptid}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from sys_user_dept where userid = #{value}
+	</delete>
+	
+	<select id="queryDeptIdList" resultType="Long">
+		select deptid from sys_user_dept where userid = #{value}
+	</select>
+	
+	<select id="queryDeptText" resultType="String">
+		select 
+			group_concat(name) DeptText 
+		from sys_department 
+		where id in
+		<foreach collection="deptIds" item="item" index="index" open="(" separator="," close=")" >
+		#{item}
+		</foreach>
+	</select>
+	
+	<delete id="deleteBatch">
+		delete from sys_user_dept where userid in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

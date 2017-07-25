@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.QltsuDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.QltsuEntity">
+		select
+			id, 		
+			scoretype, 		
+			addr, 		
+			lat, 		
+			lng, 		
+			score, 		
+			stime, 		
+			person, 		
+			accaddr, 		
+			img, 		
+			expl, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from qltsu where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.QltsuEntity">
+		select
+			q.id, 		
+			q.scoretype, 		
+			q.addr, 		
+			q.lat, 		
+			q.lng, 		
+			q.score,
+			(select bc.cnm from base_code bc where bc.no = q.score and bc.type="score" ) AS scoreName,
+			q.stime, 		
+			q.person, 
+			(select su.name from sys_user su where su.id = q.person ) AS personName,		
+			(select GROUP_CONCAT(sd.name) from sys_user su,sys_user_dept sud,sys_department sd where su.id = 
+					q.person and su.id = sud.userid and sud.deptid = sd.id) AS deptName,
+			q.accaddr, 		
+			q.img, 		
+			q.expl, 		
+			q.status, 		
+			q.crtid,
+			(select su.name from sys_user su where su.id = q.crtid ) AS crtName, 		
+			q.crttm, 		
+			q.updid, 		
+			q.updtm		
+		from qltsu q
+		<where>
+			<if test="name != null and name != ''">
+				(select su.name from sys_user su where su.id = q.person) = #{name}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by q.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.QltsuEntity">
+		SELECT
+			DISTINCT
+			q.id,
+			q.scoretype,
+			q.addr,
+			q.lat,
+			q.lng,
+			q.score,
+			base_code.cnm AS scoreName,
+			q.stime,
+			q.person,
+			users.`name` AS personName,
+			(
+				SELECT
+					GROUP_CONCAT(sd.`name`)
+				FROM
+					sys_user su,
+					sys_user_dept sud,
+					sys_department sd
+				WHERE
+					su.id = q.person
+				AND su.id = sud.userid
+				AND sud.deptid = sd.id
+			) AS deptName,
+			q.accaddr,
+			q.img,
+			q.expl,
+			q.`status`,
+			q.crtid,
+			sysUser.`name` AS crtName,
+			q.crttm,
+			q.updid,
+			q.updtm
+		FROM
+			qltsu q
+		LEFT JOIN base_code ON base_code.id = q.score
+		INNER JOIN sys_user users ON users.id = q.person
+		INNER JOIN sys_user sysUser ON sysUser.id = q.crtid
+		INNER JOIN sys_user_dept ON sys_user_dept.userid = users.updid
+		<where>
+			<if test="name != null and name != ''">
+				(select su.name from sys_user su where su.id = q.person) = #{name}
+			</if>
+			<if test="ids != null and ids != ''">
+				and FIND_IN_SET(sys_user_dept.deptid,#{ids})
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by q.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select 
+			count(*) 
+		from 
+			(
+				SELECT
+					DISTINCT
+					q.id,
+					q.scoretype,
+					q.addr,
+					q.lat,
+					q.lng,
+					q.score,
+					base_code.cnm AS scoreName,
+					q.stime,
+					q.person,
+					users.`name` AS personName,
+					(
+						SELECT
+							GROUP_CONCAT(sd.`name`)
+						FROM
+							sys_user su,
+							sys_user_dept sud,
+							sys_department sd
+						WHERE
+							su.id = q.person
+						AND su.id = sud.userid
+						AND sud.deptid = sd.id
+					) AS deptName,
+					q.accaddr,
+					q.img,
+					q.expl,
+					q.`status`,
+					q.crtid,
+					sysUser.`name` AS crtName,
+					q.crttm,
+					q.updid,
+					q.updtm
+				FROM
+					qltsu q
+				LEFT JOIN base_code ON base_code.id = q.score
+				INNER JOIN sys_user users ON users.id = q.person
+				INNER JOIN sys_user sysUser ON sysUser.id = q.crtid
+				INNER JOIN sys_user_dept ON sys_user_dept.userid = users.updid
+				<where>
+					<if test="name != null and name != ''">
+						(select su.name from sys_user su where su.id = q.person) = #{name}
+					</if>
+					<if test="ids != null and ids != ''">
+						and FIND_IN_SET(sys_user_dept.deptid,#{ids})
+					</if>
+				</where>
+			) qs
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.QltsuEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into qltsu
+		(
+			`scoretype`, 
+			`addr`, 
+			`lat`, 
+			`lng`, 
+			`score`, 
+			`stime`, 
+			`person`, 
+			`accaddr`, 
+			`img`, 
+			`expl`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{scoretype}, 
+			#{addr}, 
+			#{lat}, 
+			#{lng}, 
+			#{score}, 
+			#{stime}, 
+			#{person}, 
+			#{accaddr}, 
+			#{img}, 
+			#{expl}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.QltsuEntity">
+		update qltsu 
+		<set>
+			<if test="scoretype != null">`scoretype` = #{scoretype}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="score != null">`score` = #{score}, </if>
+			<if test="stime != null">`stime` = #{stime}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="accaddr != null">`accaddr` = #{accaddr}, </if>
+			<if test="img != null">`img` = #{img}, </if>
+			<if test="expl != null">`expl` = #{expl}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from qltsu where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from qltsu where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

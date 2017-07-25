@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.GridmngDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.GridmngEntity">
+		select
+			id, 		
+			name, 		
+			uid, 		
+			dept, 		
+			type, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from gridmng where id = #{value}
+	</select>
+	
+	<select id="queryObject2" resultType="java.util.Map">
+		select
+			gm.id, 		
+			gm.name, 
+			(select GROUP_CONCAT(lon) from griddes where fid = gm.id ORDER BY sort asc) lon,
+			(select GROUP_CONCAT(lat) from griddes where fid = gm.id ORDER BY sort asc) lat,
+			gm.uid, 		
+			gm.dept, 		
+			gm.type, 		
+			gm.crtid, 		
+			gm.crttm, 		
+			gm.updid, 		
+			gm.updtm		
+		from gridmng gm where gm.id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.GridmngEntity">
+		select
+			id, 		
+			name, 		
+			uid, 		
+			dept, 		
+			type, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from gridmng 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList2" resultType="java.util.Map">
+		select
+			gm.id, 		
+			gm.name, 
+			(select GROUP_CONCAT(lon) from griddes where fid = gm.id ORDER BY sort asc) lon,
+			(select GROUP_CONCAT(lat) from griddes where fid = gm.id ORDER BY sort asc) lat,
+			gm.uid, 		
+			gm.dept, 		
+			gm.type, 		
+			gm.crtid, 		
+			gm.crttm, 		
+			gm.updid, 		
+			gm.updtm		
+		from gridmng gm
+		where gm.dept = #{dept}
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from gridmng 
+		where dept = #{dept}
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.GridmngEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into gridmng
+		(
+			`name`, 
+			`uid`, 
+			`dept`, 
+			`type`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{name}, 
+			#{uid}, 
+			#{dept}, 
+			#{type}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.GridmngEntity">
+		update gridmng 
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="uid != null">`uid` = #{uid}, </if>
+			<if test="dept != null">`dept` = #{dept}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from gridmng where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from gridmng where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="statics/plugins/zui/dist/css/zui.css">
+    <link rel="stylesheet" type="text/css" href="statics/plugins/zui/dist/lib/uploader/zui.uploader.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id='uploaderExample2' class="uploader" data-ride="uploader">
+        <div class="uploader-message text-center">
+            <div class="content"></div>
+            <button type="button" class="close">×</button>
+        </div>
+        <div class="uploader-files file-list file-list-lg" data-drag-placeholder="请拖拽文件到此处"></div>
+        <div class="uploader-actions">
+            <div class="uploader-status pull-right text-muted"></div>
+            <button type="button" class="btn btn-link uploader-btn-browse"><i class="icon icon-plus"></i> 选择文件</button>
+            <button type="button" class="btn btn-link uploader-btn-start"><i class="icon icon-cloud-upload"></i> 开始上传</button>
+        </div>
+    </div>
+</body>
+<script src="statics/plugins/zui/dist/lib/jquery/jquery.js"></script>
+<script src="statics/plugins/zui/dist/js/zui.min.js"></script>
+<script src="statics/plugins/zui/dist/lib/uploader/zui.uploader.min.js"></script>
+<script type="text/javascript">
+$('#uploaderExample2').uploader({
+    autoUpload: false, 
+    rename: false,
+    multi_selection: true,
+    limitFilesCount: 3,
+    file_data_name: 'file',
+    filters:{
+        mime_types: [
+            {title: '图片', extensions: 'jpg,gif,png'},
+            {title: '图标', extensions: 'ico'}
+        ],
+        max_file_size: '1mb',
+        prevent_duplicates: true
+    },
+    renameByClick: false,
+    url: 'http://192.168.1.13:80/fileService/app/upload/',
+    responseHandler: function(responseObject, file){
+        r = JSON.parse(responseObject.response);
+        alert(r.data[0]);
+    }
+});
+</script>
+
+</html>

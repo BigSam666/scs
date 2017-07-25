@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>保险管理</title>
+#parse("sys/header.html")
+<style type="text/css">
+.finsure .binsure {
+	overflow-x:false;
+}
+.binsure .tname,.finsure .tname{
+	width: 180px;
+ 	border-left: none;
+}
+.binsure .tvalue,.finsure .tvalue{
+ 	border-right: none;
+}
+.form-div th {
+    font-weight: bold;
+}
+.finsure-table-left {
+	border-left: none !important;
+	font-weight: bold;
+}
+.finsure-table-right {
+	border-right: none !important;
+	font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		
+		<fieldset>
+				<legend>
+					<i class="fa fa-search"></i>&nbsp;查询条件
+				</legend>
+
+				<div class="col-sm-3">
+					<!-- <label class="col-sm-4 control-label">下单结束时间：</label> -->
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="q.condition"
+							@keyup.enter="query" placeholder="请输入车牌号">
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<label class="myLabel-content" style="margin-top: 8px;">日期范围：</label>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="starttime"
+							placeholder="开始日期" onClick="WdatePicker()" />
+					</div>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="endtime"
+							placeholder="结束日期" onClick="WdatePicker()" />
+					</div>
+				</div>
+
+
+				<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+				</div>
+
+			</fieldset>
+		
+		<div class="grid-btn">
+			#if($shiro.hasPermission("insure:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("insure:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("insure:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">车牌号</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="insure.cno" name="cno" placeholder="车牌号"/> -->
+      <input id="cno" class="easyui-combobox" name="cno" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+	       			<div class="form-group">
+	 <div class="col-sm-2 control-label">保单号码</div>
+	   	   	<div class="col-sm-10">
+	      <input type="text" class="form-control" v-model="insure.insno" name="insno" placeholder="保单号码"/>
+	</div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">投保日期</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" name="insuretm" id="insuretm" placeholder="投保日期" onClick="WdatePicker()" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">到期日期</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" name="ninstm" id="ninstm" placeholder="到期日期" onClick="WdatePicker()" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">投保明细</div>
+   	   	<div class="col-sm-10">
+   	   	<input type="hidden" id="insdetail" name="insdetail" v-model="insure.insdetail" />
+      <input type="text" class="form-control" placeholder="请选择" @click="insdetail" v-model="insure.insdetailTest" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">办理人员</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="insure.person" name="person" placeholder="办理人员"/> -->
+     		 <input type="hidden" v-model="insure.person" name="person" />
+		    <input type="text" class="form-control" style="cursor:pointer;" v-model="insure.personName" @click="personTree" readonly="readonly" placeholder="办理人员"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">投保费用</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="insure.cost" name="cost" placeholder="投保费用" readonly="true"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">投保单位</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="insure.unit" name="unit" placeholder="投保单位"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">投保地点</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="insure.addr" name="addr" placeholder="保险地点"/>
+    </div>
+       	</div>
+   				   	<div class="form-group" style="display: none">
+   	<div class="col-sm-2 control-label">状态</div>
+   	   	<label class="radio-inline">
+	  <input type="radio" name="status" value="1" v-model="insure.status"/> 有效
+	</label>
+   	<label class="radio-inline">
+	  <input type="radio" name="status" value="0" v-model="insure.status"/> 无效
+	</label>
+       	</div>
+   																	#if($shiro.hasPermission("insure:update") || $shiro.hasPermission("insure:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+<!-- 办理人员 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+<!-- 投保明细 -->
+<div id="insdetailLayer" style="display: none;text-indent: 1em;">
+	<form id="insdetail-form">
+	<!-- 强制保险 -->
+	<div class="finsure form-div">
+		<table class="finsure-table">
+			<tr><th>强制保险</th></tr>
+			<tr class="table1">
+				<td class="finsure-table-left">款项</td>
+				<td class="finsure-table-right">金额</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 商业保险 -->
+	<div class="binsure form-div">
+		<table class="binsure-table">
+			<tr><th>商业保险</th></tr>
+			<tr class="table2">
+				<td class="finsure-table-left">款项</td>
+				<td class="finsure-table-right">金额</td>
+			</tr>
+		</table>
+	</div>
+	</form>
+</div>
+<script src="${rc.contextPath}/js/insure/insure.js?_${date.systemTime}"></script>
+</body>
+</html>

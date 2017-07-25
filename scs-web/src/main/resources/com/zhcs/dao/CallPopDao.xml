@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CallPopDao">
+
+	<insert id="save" parameterType="com.zhcs.entity.CallPopEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into call_jobsel
+		(
+		`source`,
+		`name`,
+		`type`,
+		`phone`,
+		`adds`,
+		`content`,
+		`date`,
+		`img`,
+		`crtid`,
+		`crttm`,
+		`updid`,
+		`updtm`
+		)
+		values
+		(
+		#{source},
+		#{name},
+		#{type},
+		#{phone},
+		#{adds},
+		#{content},
+		#{date},
+		#{img},
+		#{crtid},
+		#{crttm},
+		#{updid},
+		#{updtm}
+		)
+	</insert>
+
+	<!-- 根据当前的用户名查询用户的分机号码 -->
+	<select id="queryCallNumber" resultType="int">
+		SELECT IFNULL((SELECT fphone FROM call_seats WHERE id =#{name} LIMIT 1),0) as fphone
+	</select>
+
+	<!-- 根据手机号码查询对应的手机号码 -->
+	<select id="queryName" resultType="string">
+		SELECT name from(
+			SELECT name,phone from call_jobsel <!-- 工单查询 -->
+			union
+			SELECT name,phone from call_seats <!-- 坐席管理 -->
+			union
+			SELECT nm as name,mobile as phone from citizen <!-- 市民 -->
+			union
+			SELECT realname,mobile as phone from sys_user <!-- 系统用户 -->
+		)as name where phone = #{phone} GROUP BY phone
+	</select>
+</mapper>

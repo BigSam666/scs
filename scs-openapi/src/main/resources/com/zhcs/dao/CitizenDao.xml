@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CitizenDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CitizenEntity">
+		select
+			id, 		
+			wechatid, 		
+			mobile, 		
+			nm, 		
+			gender, 		
+			faceimg, 		
+			addr, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from citizen where id = #{value}
+	</select>
+
+
+	<select id="queryObjectByWeChatId" resultType="com.zhcs.entity.CitizenEntity">
+		select
+		id,
+		wechatid,
+		mobile,
+		nm,
+		gender,
+		faceimg,
+		addr,
+		crtid,
+		crttm,
+		updid,
+		updtm
+		from citizen where wechatid = #{value}
+	</select>
+
+</mapper>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.AccidentDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.AccidentEntity">
+		select
+			id, 		
+			car, 	
+			(select f.nm from fleett f where f.id = (select c.fleett from car c where c.id = car)) AS fleettName,		
+			person, 		
+			adate, 		
+			addr, 		
+			ares, 
+			(select bc.cnm from base_code bc where bc.id = ares) AS aresName,		
+			money, 		
+			rmoney, 		
+			content, 		
+			pics, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from accident where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.AccidentEntity">
+		select
+			a.id, 		
+			a.car,
+			(select c.cno from car c where c.id = a.car ) AS carNo, 
+			(select f.nm from fleett f where f.id = (select c.fleett from car c where c.id = a.car)) AS fleettName,		
+			a.person, 
+			(select su.name from sys_user su where su.id = a.person) AS personName,		
+			a.adate, 		
+			a.addr, 		
+			a.ares,
+			(select bc.cnm from base_code bc where bc.id = ares) AS aresName, 		
+			a.money, 		
+			a.rmoney, 		
+			a.content, 		
+			a.pics, 		
+			a.status, 		
+			a.crtid, 		
+			a.crttm, 		
+			a.updid, 		
+			a.updtm		
+		from accident a
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by a.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.AccidentEntity">
+		SELECT
+			accident.id,
+			accident.car,
+			car.cno AS carNo,
+			fleett.nm AS fleettName,
+			accident.person,
+			sys_user.realname AS personName,
+			accident.adate,
+			accident.addr,
+			base_code.cnm AS aresName,
+			accident.money,
+			accident.rmoney,
+			accident.content,
+			accident.pics,
+			accident.`status`,
+			accident.crtid,
+			accident.crttm,
+			accident.updid,
+			accident.updtm
+		FROM
+			accident
+		LEFT JOIN sys_user ON sys_user.id = accident.person
+		LEFT JOIN base_code ON base_code.id = accident.ares
+		INNER JOIN car ON car.id = accident.car
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(accident.adate,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(accident.adate,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+			
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) 	FROM
+			accident
+		LEFT JOIN sys_user ON sys_user.id = accident.person
+		LEFT JOIN base_code ON base_code.id = accident.ares
+		INNER JOIN car ON car.id = accident.car
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(accident.adate,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(accident.adate,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.AccidentEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into accident
+		(
+			`car`, 
+			`person`, 
+			`adate`, 
+			`addr`, 
+			`ares`, 
+			`money`, 
+			`rmoney`, 
+			`content`, 
+			`pics`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{car}, 
+			#{person}, 
+			#{adate}, 
+			#{addr}, 
+			#{ares}, 
+			#{money}, 
+			#{rmoney}, 
+			#{content}, 
+			#{pics}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.AccidentEntity">
+		update accident 
+		<set>
+			<if test="car != null">`car` = #{car}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="adate != null">`adate` = #{adate}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="ares != null">`ares` = #{ares}, </if>
+			<if test="money != null">`money` = #{money}, </if>
+			<if test="rmoney != null">`rmoney` = #{rmoney}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="pics != null">`pics` = #{pics}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from accident where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from accident where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

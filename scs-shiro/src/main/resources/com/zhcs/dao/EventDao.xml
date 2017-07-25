@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.EventDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.EventEntity">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event where id = #{value}
+	</select>
+
+	<select id="queryByNo" resultType="com.zhcs.entity.EventEntity">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event where no = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.EventEntity">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 	
+			estimatetm,
+			auxiliary,	
+			des, 		
+			dltm, 		
+			current, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList2" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			current currentType, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event 
+		where current in 
+		<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+			#{cc}
+		</foreach>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList3" resultType="java.util.Map">
+		SELECT
+			`event`.id,
+			`event`.busseg,
+			`event`.`no`,
+			`event`.sour,
+			`event`.qdescribe,
+			`event`.lng,
+			`event`.lat,
+			`event`.addr,
+			`event`.qimg,
+			`event`.handle,
+			`event`.htm,
+			`event`.img,
+			`event`.estimatetm,
+			`event`.auxiliary,
+			`event`.des,
+			`event`.dltm,
+			`event`.current,
+			`event`.current AS currentType,
+			`event`.crtid,
+			`event`.crttm,
+			`event`.updid,
+			`event`.updtm
+		FROM
+			`event`
+		LEFT JOIN sys_user_dept sud1 ON sud1.userid = `event`.handle
+		LEFT JOIN sys_user_dept sud2 ON sud2.userid = `event`.auxiliary
+		where current in 
+		<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+			#{cc}
+		</foreach>
+		<if test="ids != null and ids != ''">
+			AND ( FIND_IN_SET(sud1.deptid, #{ids}) OR FIND_IN_SET(sud2.deptid, #{ids}))
+		</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="historyList" resultType="java.util.Map">
+		select
+			a.id, 		
+			a.busseg, 		
+			a.no, 		
+			a.sour, 		
+			a.qdescribe, 		
+			a.lng, 		
+			a.lat, 		
+			a.addr, 		
+			a.qimg, 		
+			a.handle, 		
+			a.htm, 		
+			a.img, 
+			a.estimatetm,
+			a.auxiliary,		
+			a.des, 		
+			a.dltm, 		
+			a.flag, 		
+			a.current, 		
+			a.current currentType, 	
+			if(ISNULL(a.estimatetm), now(), a.estimatetm) > a.updtm flg2,
+			(select b.current from event_log b where b.no = a.no ORDER BY b.id DESC limit 1 ) tag,
+			a.crtid, 		
+			a.crttm, 		
+			a.updid, 		
+			a.updtm		
+		from event_log a 
+		where a.current in 
+		<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+			#{cc}
+		</foreach>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="getHandleList" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			current currentType, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event_log 
+		where updid = #{uid}
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="getHandleList1" resultType="java.util.Map">
+		select
+			event_log.id, 		
+			event_log.busseg, 		
+			event_log.no, 		
+			event_log.sour, 		
+			event_log.qdescribe, 		
+			event_log.lng, 		
+			event_log.lat, 		
+			event_log.addr, 		
+			event_log.qimg, 		
+			event_log.handle, 		
+			event_log.htm, 		
+			event_log.img, 
+			event_log.estimatetm,
+			event_log.auxiliary,		
+			event_log.des, 		
+			event_log.dltm, 		
+			event_log.current, 		
+			event_log.current currentType, 		
+			event_log.crtid, 		
+			event_log.crttm, 		
+			event_log.updid, 		
+			event_log.updtm		
+		from event_log 
+		LEFT JOIN sys_user_dept sud1 ON sud1.userid = event_log.handle
+		LEFT JOIN sys_user_dept sud2 ON sud2.userid = event_log.auxiliary
+		where event_log.updid = #{uid}
+		<if test="ids != null and ids != ''">
+			AND ( FIND_IN_SET(sud1.deptid, #{ids}) OR FIND_IN_SET(sud2.deptid, #{ids}))
+		</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="fulfilList" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			current currentType, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event_log 
+		where current in 
+		<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+			#{cc}
+		</foreach>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="fulfilList1" resultType="java.util.Map">
+		select
+			event_log.id, 		
+			event_log.busseg, 		
+			event_log.no, 		
+			event_log.sour, 		
+			event_log.qdescribe, 		
+			event_log.lng, 		
+			event_log.lat, 		
+			event_log.addr, 		
+			event_log.qimg, 		
+			event_log.handle, 		
+			event_log.htm, 		
+			event_log.img, 
+			event_log.estimatetm,
+			event_log.auxiliary,		
+			event_log.des, 		
+			event_log.dltm, 		
+			event_log.current, 		
+			event_log.current currentType, 		
+			event_log.crtid, 		
+			event_log.crttm, 		
+			event_log.updid, 		
+			event_log.updtm		
+		from event_log 
+		LEFT JOIN sys_user_dept sud1 ON sud1.userid = event_log.handle
+		LEFT JOIN sys_user_dept sud2 ON sud2.userid = event_log.auxiliary
+		where event_log.current in 
+		<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+			#{cc}
+		</foreach>
+		<if test="ids != null and ids != ''">
+			AND ( FIND_IN_SET(sud1.deptid, #{ids}) OR FIND_IN_SET(sud2.deptid, #{ids}))
+		</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<!-- 判断某用户有多少完成未完成的 -->
+	<select id="getHandleSituation" resultType="java.util.Map">
+		select
+			(select count(*) from event where handle = #{value}) pending,
+			(select count(*) from event_log where handle = #{value}) ap
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from event 
+		LEFT JOIN sys_user_dept sud1 ON sud1.userid = event.handle
+		LEFT JOIN sys_user_dept sud2 ON sud2.userid = event.auxiliary
+		<if test="ccs != null">
+			<where>
+				current in
+				<foreach collection="ccs" item="cc" open="(" close=")" separator=",">
+					#{cc}
+				</foreach>
+				<if test="ids != null and ids != ''">
+					AND ( FIND_IN_SET(sud1.deptid, #{ids}) OR FIND_IN_SET(sud2.deptid, #{ids}))
+				</if>
+			</where>
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.EventEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into event
+		(
+			`busseg`, 
+			`no`, 
+			`sour`, 
+			`qdescribe`, 
+			`lng`, 
+			`lat`, 
+			`addr`, 
+			`qimg`, 
+			`handle`, 
+			`htm`, 
+			`img`, 
+			`estimatetm`, 
+			`auxiliary`,
+			`des`, 
+			`dltm`, 
+			`current`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{busseg}, 
+			#{no}, 
+			#{sour}, 
+			#{qdescribe}, 
+			#{lng}, 
+			#{lat}, 
+			#{addr}, 
+			#{qimg}, 
+			#{handle}, 
+			#{htm}, 
+			#{img}, 
+			#{estimatetm}, 
+			#{auxiliary}, 
+			#{des}, 
+			#{dltm}, 
+			#{current}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.EventEntity">
+		update event 
+		<set>
+			<if test="busseg != null">`busseg` = #{busseg}, </if>
+			<if test="no != null">`no` = #{no}, </if>
+			<if test="sour != null">`sour` = #{sour}, </if>
+			<if test="qdescribe != null">`qdescribe` = #{qdescribe}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="qimg != null">`qimg` = #{qimg}, </if>
+			<if test="handle != null">`handle` = #{handle}, </if>
+			<if test="htm != null">`htm` = #{htm}, </if>
+			<if test="img != null">`img` = #{img}, </if>
+			<if test="estimatetm != null">`estimatetm` = #{estimatetm}, </if>
+			<if test="auxiliary != null">`auxiliary` = #{auxiliary}, </if>
+			<if test="des != null">`des` = #{des}, </if>
+			<if test="dltm != null">`dltm` = #{dltm}, </if>
+			<if test="current != null">`current` = #{current}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from event where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from event where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

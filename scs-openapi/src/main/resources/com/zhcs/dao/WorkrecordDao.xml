@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.WorkrecordDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.WorkrecordEntity">
+		select
+			id, 		
+			busseg, 	
+			img, 		
+			addr, 	
+			accaddr,	
+			lat, 		
+			lng, 		
+			expl, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from workRecord where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.WorkrecordEntity">
+		select
+			id, 		
+			busseg, 		
+			img, 		
+			addr, 	
+			accaddr,	
+			lat, 		
+			lng, 		
+			expl, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from workRecord 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and pagesize != null">
+			limit #{offset}, #{pagesize}
+		</if>
+	</select>
+
+	<select id="queryList2" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			img, 		
+			addr, 	
+			accaddr,	
+			lat, 		
+			lng, 		
+			expl, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from workRecord
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and pagesize != null">
+			limit #{offset}, #{pagesize}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from workRecord
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.WorkrecordEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into workRecord
+		(
+			`busseg`, 
+			`img`, 
+			`addr`, 
+			`accaddr`,
+			`lat`, 
+			`lng`, 
+			`expl`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{busseg}, 
+			#{img}, 
+			#{addr}, 
+			#{accaddr}, 
+			#{lat}, 
+			#{lng}, 
+			#{expl}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.WorkrecordEntity">
+		update workRecord 
+		<set>
+			<if test="busseg != null">`busseg` = #{busseg}, </if>
+			<if test="img != null">`img` = #{img}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="accaddr != null">`accaddr` = #{accaddr}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="expl != null">`expl` = #{expl}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from workRecord where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from workRecord where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

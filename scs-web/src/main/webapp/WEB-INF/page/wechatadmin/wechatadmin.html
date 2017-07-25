@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>微信关注列表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("wechatadmin:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("wechatadmin:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("wechatadmin:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+										<div class="form-group">
+			   	<div class="col-sm-2 control-label">用户标识</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.openid" name="openid" placeholder="用户标识"/>
+			    </div>
+			</div>
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否订阅</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.subscribe" name="subscribe" placeholder="是否订阅(0表示没有关注)"/>
+			    </div>
+			</div>
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">用户昵称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.nickname" name="nickname" placeholder="用户昵称"/>
+			    </div>
+			</div>
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">性别</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.sex" name="sex" placeholder="性别(0未知,1男,2,女)"/>
+			    </div>
+			</div>
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">所在城市</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.city" name="city" placeholder="所在城市"/>
+			    </div>
+			</div>
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">所在国家</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.country" name="country" placeholder="所在国家"/>
+			    </div>
+			</div>
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">所在省份</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.province" name="province" placeholder="所在省份"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">语言</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.language" name="language" placeholder="语言"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">头像</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.headimgurl" name="headimgurl" placeholder="头像"/>
+			      <img name="headimg" src="" width="200" />
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">关注时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatadmin.subscribeTime" name="subscribe_time" placeholder="关注时间"/>
+			    </div>
+			</div>
+			#if($shiro.hasPermission("wechatadmin:update") || $shiro.hasPermission("wechatadmin:save"))
+			<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+			#end
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/wechatadmin/wechatadmin.js?_${date.systemTime}"></script>
+</body>
+</html>

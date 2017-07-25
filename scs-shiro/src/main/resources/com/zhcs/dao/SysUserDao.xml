@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.SysUserDao">
+	<select id="queryObject" resultType="com.zhcs.entity.SysUserEntity">
+		select
+			id, 
+			wechatid,
+			name, 
+			realname, 
+			cardno, 
+			pwd, 
+			salt, 
+			email, 
+			mobile, 
+			status, 
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_user where id = #{value}
+	</select>
+	
+	<select id="queryUsersBydepts" resultType="com.zhcs.entity.SysUserEntity">
+		select 
+			distinct su.* from sys_user su,sys_user_dept sud 
+		where 
+			su.id=sud.userid 
+		and sud.deptid in
+		<foreach collection="list" item="dept" open="(" separator="," close=")">
+			#{dept}
+		</foreach>
+	</select>
+	
+	<select id="queryRoleByUser" resultType="com.zhcs.entity.SysRoleEntity">
+		select sr.*
+		from sys_role sr,sys_user_role sur
+		where sr.id=sur.roleid
+		and sur.userid=#{value}
+	</select>
+	
+	<select id="queryList" resultType="com.zhcs.entity.SysUserEntity">
+		select
+			id, 
+			wechatid,
+			name,
+			realname, 
+			cardno,  
+			pwd, 
+			salt, 
+			email, 
+			mobile, 
+			status, 
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_user 
+		<where>
+			<if test="name != null and name.trim() != ''">
+				and concat_ws(',', realname, `name`, mobile) like concat('%',#{name},'%') 
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="getUserListByMsg" resultType="java.util.Map">
+	SELECT
+		id id,
+		realname nm,
+		realname text
+	FROM
+		sys_user
+	</select>
+	
+	<select id="queryDepartmentByUserId" resultType="com.zhcs.entity.SysDepartmentEntity">
+		select
+			sd.id,
+			sd.pid,
+			sd.name,
+			sd.valid,
+			sd.otype,
+			sd.rmk
+		from sys_department sd,sys_user_dept sud
+		where sd.id = sud.deptid and sud.userid = #{value}
+	</select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(*) from sys_user
+		<where>
+			<if test="name != null and name.trim() != ''">
+				and concat_ws(',', realname, `name`, mobile) like concat('%',#{name},'%') 
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询用户的所有权限 -->
+	<select id="queryAllPerms" resultType="String">
+		select m.perms from sys_user_role ur 
+			LEFT JOIN sys_role_menu rm on ur.roleid = rm.roleid 
+			LEFT JOIN sys_menu m on rm.menuid = m.id 
+		where ur.userid = #{id}
+	</select>
+	
+	<!-- 查询用户的所有菜单ID --> 
+	<select id="queryAllMenuId" resultType="Long">
+		select m.id from sys_user_role ur 
+			LEFT JOIN sys_role_menu rm on ur.roleid = rm.roleid 
+			LEFT JOIN sys_menu m on rm.menuid = m.id 
+		where ur.userid = #{id}
+	</select>
+	
+	<select id="queryByUserName" resultType="com.zhcs.entity.SysUserEntity">
+		select
+			id, 
+			wechatid,
+			name, 
+			realname, 
+			cardno, 
+			pwd, 
+			salt, 
+			email, 
+			mobile, 
+			status, 
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_user where name = #{value}
+	</select>
+
+	<select id="queryByOpenId" resultType="com.zhcs.entity.SysUserEntity">
+		select
+			id, 
+			wechatid,
+			name, 
+			realname, 
+			cardno, 
+			pwd, 
+			salt, 
+			email, 
+			mobile, 
+			status, 
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_user where wechatid = #{wechatid}
+	</select>
+
+	<select id="queryByMobile" resultType="com.zhcs.entity.SysUserEntity">
+		select
+			id, 
+			wechatid,
+			name, 
+			realname, 
+			cardno, 
+			pwd, 
+			salt, 
+			email, 
+			mobile, 
+			status, 
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_user where mobile = #{mobile}
+	</select>
+	
+	<insert id="save" parameterType="com.zhcs.entity.SysUserEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_user
+		(
+			`id`, 
+			`name`, 
+			`realname`, 
+			`cardno`, 
+			`pwd`, 
+			`salt`, 
+			`email`, 
+			`mobile`, 
+			`status`, 
+			`crtid`,
+			`crttm`,
+			`updid`,
+			`updtm`
+		)
+		values
+		(
+			#{id}, 
+			#{name}, 
+			#{realname}, 
+			#{cardno}, 
+			#{pwd}, 
+			#{salt}, 
+			#{email}, 
+			#{mobile}, 
+			#{status}, 
+			#{crtid},
+			#{crttm},
+			#{updid},
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.SysUserEntity">
+		update sys_user 
+		<set> 
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="wechatid != null">`wechatid` = #{wechatid}, </if>
+			<if test="realname != null">`realname` = #{realname}, </if>
+			<if test="cardno != null">`cardno` = #{cardno}, </if>
+			<if test="pwd != null">`pwd` = #{pwd}, </if>
+			<if test="salt != null">`salt` = #{salt}, </if>
+			<if test="email != null">`email` = #{email}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updatePassword" parameterType="map">
+		update sys_user set `pwd` = #{newPassword}, 
+				`salt` = #{salt}, `updid` = #{updid}, `updtm` = #{updtm}
+			where id = #{id} and pwd = #{pwd}
+	</update>
+	
+	<delete id="deleteBatch">
+		delete from sys_user where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		;
+		delete from sys_user_role where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="queryListTree" resultType="java.util.Map">
+		select
+		  d.name,
+		  d.pid,
+		  d.pid ztpid,
+		  d.id,
+		  d.id ztid
+		from sys_department d
+		union
+		select 
+			u.realname,
+			null pid,
+			ud.deptid ztpid,
+		  u.id id,
+		  (9223372036854775807) ztid
+		from sys_user_dept ud left join sys_user u
+		on ud.userid = u.id
+	</select>
+
+</mapper>

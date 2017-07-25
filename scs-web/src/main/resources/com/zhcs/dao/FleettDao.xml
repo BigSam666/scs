@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.FleettDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.FleettEntity">
+		select
+			f.id, 		
+			f.nm, 		
+			f.dept, 
+			(select d.name from sys_department d where f.dept = d.id) AS deptName,		
+			f.captain, 
+			(select u.realname from sys_user u where u.id = f.captain) AS captainName,		
+			f.status, 		
+			f.rmk, 		
+			f.crtid, 		
+			f.crttm, 		
+			f.updid, 		
+			f.updtm		
+		from fleett f where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.FleettEntity">
+		select
+			f.id, 		
+			f.nm, 		
+			f.dept,
+			d.name AS deptName, 		
+			f.captain,
+			u.realname AS captainName, 		
+			f.status, 		
+			f.rmk, 		
+			f.crtid, 		
+			f.crttm, 		
+			f.updid, 		
+			f.updtm		
+		from fleett f,sys_department d,sys_user u
+		<where>
+			f.dept = d.id and u.id = f.captain
+			<if test="condition !=null and condition.trim() != ''">
+				and	(d.name like concat('%',#{condition},'%') or u.realname like concat('%',#{condition},'%') or f.nm like concat('%',#{condition},'%'))
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by f.${sidx} f.${order} 
+			</when>
+			<otherwise>
+				order by f.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.FleettEntity">
+		select
+			f.id, 		
+			f.nm, 		
+			f.dept,
+			d.name AS deptName, 		
+			f.captain,
+			u.realname AS captainName, 		
+			f.status, 		
+			f.rmk, 		
+			f.crtid, 		
+			f.crttm, 		
+			f.updid, 		
+			f.updtm		
+		from fleett f,sys_department d,sys_user u
+		<where>
+			f.dept = d.id and u.id = f.captain and FIND_IN_SET(d.id,#{ids})
+			<if test="condition !=null and condition.trim() != ''">
+				and	( u.realname like concat('%',#{condition},'%') or f.nm like concat('%',#{condition},'%'))
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by f.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from  fleett f,sys_department d,sys_user u 
+		<where>
+			f.dept = d.id and u.id = f.captain and FIND_IN_SET(d.id,#{ids})
+			<if test="condition !=null and condition.trim() != ''">
+				and	( u.realname like concat('%',#{condition},'%') or f.nm like concat('%',#{condition},'%'))
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.FleettEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into fleett
+		(
+			`nm`, 
+			`dept`, 
+			`captain`, 
+			`status`, 
+			`rmk`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{nm}, 
+			#{dept}, 
+			#{captain}, 
+			#{status}, 
+			#{rmk}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.FleettEntity">
+		update fleett 
+		<set>
+			<if test="nm != null">`nm` = #{nm}, </if>
+			<if test="dept != null">`dept` = #{dept}, </if>
+			<if test="captain != null">`captain` = #{captain}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="rmk != null">`rmk` = #{rmk}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from fleett where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from fleett where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

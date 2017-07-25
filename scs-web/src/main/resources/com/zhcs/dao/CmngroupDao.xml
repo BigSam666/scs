@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CmngroupDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CmngroupEntity">
+		select
+			id, 		
+			nm, 		
+			userid, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from cmngroup where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CmngroupEntity">
+		select
+			id, 		
+			nm, 		
+			userid, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm
+				
+		from cmngroup
+		where 1=1 
+		<if test="nm != null and nm != ''">
+			and cmngroup.nm like '%${nm}%'
+		</if>
+		
+		 
+		order by id
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from cmngroup
+		where 1=1   
+		<if test="nm != null and nm != ''">
+			and cmngroup.nm like '%${nm}%'
+		</if>
+	</select>
+	
+	
+	<select id="findList" resultType="java.util.Map" parameterType="java.util.Map">
+		select
+			id, 		
+			nm, 		
+			userid, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm,
+		(SELECT GROUP_CONCAT(realname) from sys_user where FIND_IN_SET(id,cmngroup.userid) ) as usernames
+				
+		from cmngroup
+		where 1=1 
+		<if test="nm != null and nm != ''">
+			and cmngroup.nm like '%${nm}%'
+		</if>
+		
+		 
+		order by id
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="findListCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select
+			count(id) 		
+			
+		from cmngroup
+		where 1=1 
+		<if test="nm != null and nm != ''">
+			and cmngroup.nm like '%${nm}%'
+		</if>
+		
+	</select>
+	
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CmngroupEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into cmngroup
+		(
+			`nm`, 
+			`userid`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{nm}, 
+			#{userid}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CmngroupEntity">
+		update cmngroup 
+		<set>
+			<if test="nm != null">`nm` = #{nm}, </if>
+			<if test="userid != null">`userid` = #{userid}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from cmngroup where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from cmngroup where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

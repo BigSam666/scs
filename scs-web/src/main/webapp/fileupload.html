@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>图片上传</title>
+<script src="statics/libs/jquery.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="statics/plugins/diyUpload/css/webuploader.css">
+<link rel="stylesheet" type="text/css" href="statics/plugins/diyUpload/css/diyUpload.css">
+<script type="text/javascript" src="statics/plugins/diyUpload/js/webuploader.html5only.min.js"></script>
+<script type="text/javascript" src="statics/plugins/diyUpload/js/diyUpload.js"></script>
+</head>
+<style>
+*{ margin:0; padding:0;}
+#box{ margin:50px auto; width:540px; min-height:400px; background:#FF9}
+#demo{ margin:50px auto; width:540px; min-height:800px; background:#CF9}
+</style>
+<body>
+<div id="">
+	<div id="test" ></div>
+</div>
+
+<div id="">
+	<div id="as" ></div>
+</div>
+</body>
+<script type="text/javascript">
+
+/*
+* 服务器地址,成功返回,失败返回参数格式依照jquery.ajax习惯;
+* 其他参数同WebUploader
+*/
+
+$('#test').diyUpload({
+	url:'http://192.168.1.13:80/fileService/app/upload/',
+	success:function( data ) {
+		console.info( data );
+	},
+	error:function( err ) {
+		console.info( err );	
+	}
+});
+
+$('#as').diyUpload({
+	url:'http://192.168.1.13:80/fileService/app/upload/',
+	success:function( data ) {
+		console.info( data );
+	},
+	error:function( err ) {
+		console.info( err );	
+	},
+	buttonText : '选择文件',
+	chunked:true,
+	// 分片大小
+	chunkSize:512 * 1024,
+	//最大上传的文件数量, 总文件大小,单个文件大小(单位字节);
+	fileNumLimit:1,
+	multiple: false,
+	multiple:false,
+	fileSizeLimit:500000 * 1024,
+	fileSingleSizeLimit:50000 * 1024,
+	accept: {},
+	pick: {
+		id:$("#as"),
+		multiple: false
+	},
+});
+</script>
+<div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+</div>
+</html>

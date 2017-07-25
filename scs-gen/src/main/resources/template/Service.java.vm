@@ -1,0 +1,33 @@
+package ${package}.service;
+
+import ${package}.entity.${className}Entity;
+
+import java.util.List;
+import java.util.Map;
+
+//*****************************************************************************
+/**
+ * <p>Title:${className}Service</p>
+ * <p>Description: ${comments}</p>
+ * <p>Copyright: ${copyright}</p>
+ * <p>Company: ${company} </p>
+ * @author ${author}
+ * @version ${version}
+ */
+//*****************************************************************************
+public interface ${className}Service {
+	
+	${className}Entity queryObject(${pk.attrType} ${pk.attrname});
+	
+	List<${className}Entity> queryList(Map<String, Object> map);
+	
+	int queryTotal(Map<String, Object> map);
+	
+	void save(${className}Entity ${classname});
+	
+	void update(${className}Entity ${classname});
+	
+	void delete(${pk.attrType} ${pk.attrname});
+	
+	void deleteBatch(${pk.attrType}[] ${pk.attrname}s);
+}

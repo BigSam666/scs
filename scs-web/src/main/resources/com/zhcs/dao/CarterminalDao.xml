@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CarterminalDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CarterminalEntity">
+		select
+			id, 		
+			devfrim, 		
+			devmodel, 		
+			devid, 		
+			g2no, 		
+			g3no, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from carterminal where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CarterminalEntity">
+		select
+			c.id, 		
+			c.devfrim, 
+			(select bc.cnm from base_code bc where bc.id=c.devfrim) AS devfrimName,		
+			c.devmodel, 
+			(select bc.cnm from base_code bc where bc.id=c.devmodel) AS devmodelName,		
+			c.devid, 		
+			c.g2no, 		
+			c.g3no, 		
+			c.crtid, 		
+			c.crttm, 		
+			c.updid, 
+			(select s.name from sys_user s where s.id=c.updid) AS updName,		
+			c.updtm		
+		from carterminal c
+		<where>
+			<if test="qdevid != null">
+				c.devid = #{qdevid}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by c.${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by c.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from carterminal 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CarterminalEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into carterminal
+		(
+			`devfrim`, 
+			`devmodel`, 
+			`devid`, 
+			`g2no`, 
+			`g3no`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{devfrim}, 
+			#{devmodel}, 
+			#{devid}, 
+			#{g2no}, 
+			#{g3no}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CarterminalEntity">
+		update carterminal 
+		<set>
+			<if test="devfrim != null">`devfrim` = #{devfrim}, </if>
+			<if test="devmodel != null">`devmodel` = #{devmodel}, </if>
+			<if test="devid != null">`devid` = #{devid}, </if>
+			<if test="g2no != null">`g2no` = #{g2no}, </if>
+			<if test="g3no != null">`g3no` = #{g3no}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from carterminal where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from carterminal where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

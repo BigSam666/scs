@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.zhcs.dao.SysDepartmentDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.SysDepartmentEntity">
+		select
+			id, 		
+			pid, 		
+			name, 		
+			valid, 		
+			sort, 		
+			rmk, 	
+			otype,	
+			pesponsible,
+			(select realname from sys_user where id = pesponsible) pname,
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sys_department where id = #{value}
+	</select>
+	
+	<select id="queryPersonByClass" resultType="com.zhcs.entity.SysUserEntity">
+		select
+			su.id,
+			su.realname
+		from sys_user_dept sud,sys_user su
+		where sud.deptid = #{value} 
+			and sud.userid = su.id 
+	</select>
+
+	<select id="queryListByOtype" resultType="com.zhcs.entity.SysDepartmentEntity">
+		select
+			id, 		
+			pid, 		
+			name, 		
+			valid, 		
+			sort, 		
+			rmk, 	
+			otype,	
+			pesponsible,
+			(select realname from sys_user where id = pesponsible) pname,
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sys_department where otype = #{value}
+	</select>
+
+	<select id="queryListByPidAndOtype" resultType="com.zhcs.entity.SysDepartmentEntity">
+		select
+			id, 		
+			pid, 		
+			name, 		
+			valid, 		
+			sort, 		
+			rmk, 	
+			otype,	
+			pesponsible,
+			(select realname from sys_user where id = pesponsible) pname,
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sys_department where pid = #{0} and otype = #{1}
+	</select>
+
+	<select id="queryObjectByPid" resultType="com.zhcs.entity.SysDepartmentEntity">
+		select
+			id, 		
+			pid, 		
+			name, 		
+			valid, 		
+			sort, 		
+			rmk, 	
+			otype,	
+			pesponsible,
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sys_department where pid = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.SysDepartmentEntity">
+		select
+			d.id, 		
+			d.pid,
+			(select p.name from sys_department p where p.id = d.pid) as pnm, 
+			(select realname from sys_user where id = pesponsible) pname,
+			d.name, 		
+			d.valid, 		
+			d.sort, 
+			d.otype,		
+			d.pesponsible,		
+			d.rmk, 		
+			d.crtid, 		
+			d.crttm, 		
+			d.updid, 		
+			d.updtm		
+		from sys_department d 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by d.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by d.id
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList2" resultType="java.util.Map">
+		select
+			d.id, 		
+			d.pid,
+			(select p.name from sys_department p where p.id = d.pid) as pnm, 
+			(select realname from sys_user where id = pesponsible) pname,
+			d.name, 		
+			d.valid, 		
+			d.sort, 
+			d.otype,		
+			d.pesponsible,		
+			d.rmk, 		
+			d.crtid, 		
+			d.crttm, 		
+			d.updid, 		
+			d.updtm		
+		from sys_department d 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by d.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by d.id
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListTree" resultType="com.zhcs.entity.SysMenuEntity">
+		select
+			id, 			
+			pid, 		
+			name, 		
+			valid, 		
+			sort, 	
+			otype,	
+			pesponsible,	
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_department order by sort asc 
+	</select>
+	
+	<select id="queryListTree2" resultType="java.util.Map">
+		select
+			id, 		
+			id dept, 	
+			pid, 		
+			name, 		
+			valid, 		
+			sort, 	
+			otype,	
+			pesponsible,	
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_department order by sort asc 
+	</select>
+	
+	<select id="queryDepartmentListTree" resultType="java.util.Map">
+		select
+			id, 		
+			id dept, 	
+			pid, 		
+			name, 		
+			valid, 		
+			sort, 	
+			otype,	
+			pesponsible,	
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm	
+		from sys_department
+		where
+			FIND_IN_SET(id,#{value})
+		order by sort asc 
+	</select>
+	
+	<select id="queryNodeDepartmentIds" resultType="java.lang.String">
+		select queryDeptLink(#{value}) as ids
+	</select>
+	
+	<select id="queryChildNodeDeptIds" resultType="java.lang.String">
+		select queryDept(#{value}) as ids
+	</select>
+	
+	<select id="queryListTreeForCmn" resultType="java.util.Map">
+		select
+			id,
+			pid,
+			otype,
+			name,
+			null userid
+		from
+			sys_department
+		union all
+			SELECT
+				u.mobile id,
+				ud.deptid pid,
+				0 otype,
+				IFNULL(CONCAT((select r.name from sys_role r, sys_user_role ur where r.id = ur.roleid and r.dept = ud.deptid and ur.userid = u.id), "-", u.realname), u.realname) name, 
+				u.id userid
+			FROM
+				sys_user u,
+				sys_user_dept ud 
+			where u.id = ud.userid
+	</select>
+	
+	<select id="queryListTreeForCmn2" resultType="java.util.Map">
+		SELECT 
+			a.id,
+			a.pid,
+			a.otype,
+			a.name,
+			a.userid
+		FROM
+		(
+		SELECT
+			id,
+			pid,
+			otype,
+			name,
+			NULL userid
+		FROM
+			sys_department
+		WHERE FIND_IN_SET(sys_department.id,#{value})
+		UNION ALL
+			SELECT
+				u.mobile id,
+				ud.deptid pid,
+				0 otype,
+				IFNULL(
+					CONCAT(
+						(
+							SELECT
+								r. NAME
+							FROM
+								sys_role r,
+								sys_user_role ur
+							WHERE
+								r.id = ur.roleid
+							AND r.dept = ud.deptid
+							AND ur.userid = u.id
+						),
+						"-",
+						u.realname
+					),
+					u.realname
+				) name,
+				u.id userid
+			FROM
+				sys_user u,
+				sys_user_dept ud
+			WHERE
+				u.id = ud.userid
+			AND FIND_IN_SET(ud.deptid,#{value})
+		) AS a
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from sys_department 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.SysDepartmentEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_department
+		(
+			`pid`, 
+			`name`, 
+			`valid`, 
+			`sort`, 
+			`otype`, 
+			`pesponsible`, 
+			`rmk`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{pid}, 
+			#{name}, 
+			#{valid}, 
+			#{sort}, 
+			#{otype}, 
+			#{pesponsible}, 
+			#{rmk}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.SysDepartmentEntity">
+		update sys_department 
+		<set>
+			<if test="pid != null">`pid` = #{pid}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="valid != null">`valid` = #{valid}, </if>
+			<if test="sort != null">`sort` = #{sort}, </if>
+			<if test="otype != null">`otype` = #{otype}, </if>
+			<if test="pesponsible != null">`pesponsible` = #{pesponsible}, </if>
+			<if test="rmk != null">`rmk` = #{rmk}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from sys_department where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from sys_department where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

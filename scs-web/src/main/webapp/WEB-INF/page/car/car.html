@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>车辆管理</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<fieldset>
+			<legend><i class="fa fa-search"></i>&nbsp;查询条件</legend>
+			<div class="form-group col-sm-12">
+			<div class="col-sm-3">
+			 <select class="form-control" v-model="q.carType" >
+						 <option v-for="option in options" v-bind:value="option.id">
+						  {{option.nm}}
+						 </option>
+					</select>
+			</div>
+			   	<div class="col-sm-3">
+					<input type="text" class="form-control" v-model="q.condition" @keyup.enter="query" placeholder="请输入车牌号">
+			    </div>
+			   	<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+			    </div>
+			</div>
+		</fieldset>
+		<div class="grid-btn">
+			#if($shiro.hasPermission("car:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("car:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("car:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal" id="form-horizontal">
+			<div class="form-group">
+   				<div class="col-sm-2 control-label">所属车队</div>
+	   	   		<div class="col-sm-10">
+					<!--       <input type="text" class="form-control" v-model="car.fleett" name="fleett" placeholder="所属车队"/> -->
+		  	  		<input id="fleett" class="easyui-combobox" name="fleett" style="width:100%;" readonly=true>
+		    	</div>
+       		</div>
+   			<div class="form-group">
+		   		<div class="col-sm-2 control-label">车辆类型</div>
+		   	   	<div class="col-sm-10">
+					<!--       <input type="text" class="form-control" v-model="car.ctype" name="ctype" placeholder="车辆类型"/> -->
+					<input id="ctype" class="easyui-combobox" name="ctype" style="width:100%;" readonly=true>
+		    	</div>
+       		</div>
+   			<div class="form-group">
+   				<div class="col-sm-2 control-label">车牌号</div>
+   	   			<div class="col-sm-10">
+      				<input type="text" class="form-control" v-model="car.cno" name="cno" placeholder="车牌号"/>
+    			</div>
+       		</div>
+       		
+       		
+   			<div class="form-group" v-show="showUploadPic">
+   				<div class="col-sm-2 control-label">选择图片</div>
+   	   			<div class="col-sm-10">
+					<div id="">
+						<div id="uploadPic" ></div>
+					</div>
+    			</div>
+       		</div>
+   			<div class="form-group" v-show="showPic">
+   				<div class="col-sm-2 control-label">
+   					<span v-show="showUploadPic">原</span>图片
+   				</div>
+   	   			<div class="col-sm-10">
+      				<img alt="" src="" id="showPic">
+    			</div>
+       		</div>
+       		
+       		
+   			<div class="form-group">
+   				<div class="col-sm-2 control-label">车架号</div>
+		   	   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="car.cin" name="cin" placeholder="车架号"/>
+			    </div>
+       		</div>
+   			<div class="form-group">
+		   		<div class="col-sm-2 control-label">发动机号</div>
+		   	   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="car.engno" name="engno" placeholder="发动机号"/>
+			    </div>
+       		</div>
+   			<div class="form-group">
+		   		<div class="col-sm-2 control-label">绑定设备（车载）</div>
+		   	   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="car.binddev" name="binddev" placeholder="绑定设备（车载）"/>
+			    </div>
+       		</div>
+   			<div class="form-group">
+		   		<div class="col-sm-2 control-label">绑定设备（RFID）</div>
+		   	   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="car.binddevrfid" name="binddevrfid" placeholder="绑定设备（RFID）"/>
+			    </div>
+       		</div>
+   			<div class="form-group">
+		   		<div class="col-sm-2 control-label">责任人</div>
+		   	   	<div class="col-sm-10">
+				  <!--       <input type="text" class="form-control" v-model="car.person" name="person" placeholder="责任人"/> -->
+			      <input type="hidden" class="form-control" style="cursor:pointer;" v-model="car.person" name="person" readonly="readonly" placeholder="责任人"/>
+			      <input type="text" class="form-control" style="cursor:pointer;" v-model="car.personName" @click="deptTree" readonly="readonly" placeholder="责任人"/>
+			    </div>
+       		</div>
+   			<div class="form-group" style="display: none">
+		   		<div class="col-sm-2 control-label">联系电话</div>
+		   	   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="car.phone" name="phone" placeholder="联系电话"/>
+			    </div>
+       		</div>
+   			<div class="form-group" style="display: none">
+		   		<div class="col-sm-2 control-label">备注</div>
+		   	   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="car.rmk" name="rmk" placeholder="备注"/>
+			    </div>
+       		</div>
+   			<div class="form-group" style="display: none">
+		   		<div class="col-sm-2 control-label">状态</div>
+		   	   	<label class="radio-inline">
+				  <input type="radio" name="status" value="1" v-model="car.status"/> 有效
+				</label>
+			   	<label class="radio-inline">
+				  <input type="radio" name="status" value="0" v-model="car.status"/> 无效
+				</label>
+       		</div>
+	   		#if($shiro.hasPermission("car:update") || $shiro.hasPermission("car:save"))
+			<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+			#end
+		</form>
+	</div>
+</div>
+
+<!-- 责任人菜单 -->
+<div id="deptLayer" style="display: none;padding:10px;">
+	<ul id="deptTree" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/car/car.js?_${date.systemTime}"></script>
+</body>
+</html>

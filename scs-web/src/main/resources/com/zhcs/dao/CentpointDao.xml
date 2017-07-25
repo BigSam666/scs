@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CentpointDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CentpointEntity">
+		select
+			id, 		
+			proj, 		
+			bus, 		
+			des, 		
+			lng, 		
+			lat, 		
+			radius, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from centpoint where id = #{value}
+	</select>
+	
+	<select id="queryObjectByProject" resultType="com.zhcs.entity.CentpointEntity">
+		select
+			id, 		
+			proj, 		
+			bus, 		
+			des, 		
+			lng, 		
+			lat, 		
+			radius, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from centpoint where proj = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CentpointEntity">
+		select
+			id, 		
+			proj, 		
+			bus, 		
+			des, 		
+			lng, 		
+			lat, 		
+			radius, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from centpoint 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList2" resultType="java.util.Map">
+		select
+			cp.id, 		
+			cp.proj, 	
+			d.`name`,
+			cp.bus,
+			(select GROUP_CONCAT(b.cnm) from base_code b where FIND_IN_SET(b.no , cp.bus) and b.type = "biztype" ) busText,
+			cp.des, 		
+			cp.lng, 		
+			cp.lat, 		
+			cp.radius, 		
+			cp.crtid, 		
+			cp.crttm, 		
+			cp.updid, 		
+			cp.updtm		
+		from centpoint cp, sys_department d 
+		WHERE cp.proj = d.id
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from centpoint 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CentpointEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into centpoint
+		(
+			`proj`, 
+			`bus`, 
+			`des`, 
+			`lng`, 
+			`lat`, 
+			`radius`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{proj}, 
+			#{bus}, 
+			#{des}, 
+			#{lng}, 
+			#{lat}, 
+			#{radius}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CentpointEntity">
+		update centpoint 
+		<set>
+			<if test="proj != null">`proj` = #{proj}, </if>
+			<if test="bus != null">`bus` = #{bus}, </if>
+			<if test="des != null">`des` = #{des}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="radius != null">`radius` = #{radius}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from centpoint where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from centpoint where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

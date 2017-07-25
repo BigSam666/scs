@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>年审管理</title> #parse("sys/header.html")
+</head>
+
+<body>
+	<div id="rrapp" v-cloak>
+		<div v-show="showList">
+
+			<fieldset>
+				<legend>
+					<i class="fa fa-search"></i>&nbsp;查询条件
+				</legend>
+
+				<div class="col-sm-3">
+					<!-- <label class="col-sm-4 control-label">下单结束时间：</label> -->
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="q.condition"
+							@keyup.enter="query" placeholder="请输入车牌号">
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<label class="myLabel-content" style="margin-top: 8px;">日期范围：</label>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="starttime"
+							placeholder="开始日期" onClick="WdatePicker()" />
+					</div>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="endtime"
+							placeholder="结束日期" onClick="WdatePicker()" />
+					</div>
+				</div>
+
+
+				<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+				</div>
+
+			</fieldset>
+
+
+			<div class="grid-btn">
+				#if($shiro.hasPermission("yeartrial:save")) <a
+					class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+				#end
+				<script type="text/javascript">
+					var update = false;
+					var del = false;
+				</script>
+				#if($shiro.hasPermission("yeartrial:update"))
+				<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+				<script type="text/javascript">
+					update = true;
+				</script>
+				#end #if($shiro.hasPermission("yeartrial:delete"))
+				<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+				<script type="text/javascript">
+					del = true;
+				</script>
+				#end
+			</div>
+			<table id="jqGrid"></table>
+			<div id="jqGridPager"></div>
+		</div>
+
+		<div v-show="!showList" class="panel panel-default">
+			<div class="panel-heading">{{title}}</div>
+			<form class="form-horizontal">
+				<div class="form-group">
+					<div class="col-sm-2 control-label">车牌号</div>
+					<div class="col-sm-10">
+						<!--       <input type="text" class="form-control" v-model="yeartrial.cno" name="cno" placeholder="车牌号"/> -->
+						<input id="cno" class="easyui-combobox" name="cno"
+							style="width: 100%;" readonly=true>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">年审日期</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="yttm" id="yttm"
+							placeholder="年审日期" onClick="WdatePicker()" readonly=true />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">到期日期</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="nyttm" id="nyttm"
+							placeholder="到期日期" onClick="WdatePicker()" readonly=true />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">年检号</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="yeartrial.ytno"
+							name="ytno" placeholder="年检号" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">办理人员</div>
+					<div class="col-sm-10">
+						<!--       <input type="text" class="form-control" v-model="yeartrial.person" name="person" placeholder="办理人员"/> -->
+						<input type="hidden" v-model="yeartrial.person" name="person" />
+						<input type="text" class="form-control" style="cursor: pointer;"
+							v-model="yeartrial.personName" @click="personTree"
+							readonly="readonly" placeholder="办理人员" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">年审费用</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="yeartrial.cost"
+							name="cost" placeholder="年审费用" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">年审单位</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="yeartrial.unit"
+							name="unit" placeholder="年审单位" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">年审地点</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="yeartrial.addr"
+							name="addr" placeholder="年审地点" />
+					</div>
+				</div>
+				<div class="form-group" style="display: none;">
+					<div class="col-sm-2 control-label">状态</div>
+					<label class="radio-inline"> <input type="radio"
+						name="status" value="1" v-model="yeartrial.status" /> 有效
+					</label> <label class="radio-inline"> <input type="radio"
+						name="status" value="0" v-model="yeartrial.status" /> 无效
+					</label>
+				</div>
+				#if($shiro.hasPermission("yeartrial:update") ||
+				$shiro.hasPermission("yeartrial:save"))
+				<div class="form-group">
+					<div class="col-sm-2 control-label"></div>
+					<input type="button" class="btn btn-primary" @click="saveOrUpdate"
+						v-show="upd" value="确定" /> &nbsp;&nbsp;<input type="button"
+						class="btn btn-warning" @click="reload" value="返回" />
+				</div>
+				#end
+			</form>
+		</div>
+	</div>
+	<!-- 办理人员 -->
+	<div id="personLayer" style="display: none; padding: 10px;">
+		<ul id="personTree" class="ztree"></ul>
+	</div>
+	<script
+		src="${rc.contextPath}/js/yeartrial/yeartrial.js?_${date.systemTime}"></script>
+</body>
+</html>

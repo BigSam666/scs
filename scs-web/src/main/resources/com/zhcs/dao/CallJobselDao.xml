@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CallJobselDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CallJobselEntity">
+		select
+			id, 		
+			source, 		
+			name, 		
+			type, 		
+			phone, 		
+			adds, 		
+			content, 		
+			date, 		
+			img, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from call_jobsel where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CallJobselEntity">
+		select
+			id, 		
+			source, 		
+			name, 		
+			type, 		
+			phone, 		
+			adds, 		
+			content, 		
+			date, 		
+			img, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from call_jobsel 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from call_jobsel 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CallJobselEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into call_jobsel
+		(
+			`source`, 
+			`name`, 
+			`type`, 
+			`phone`, 
+			`adds`, 
+			`content`, 
+			`date`, 
+			`img`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{source}, 
+			#{name}, 
+			#{type}, 
+			#{phone}, 
+			#{adds}, 
+			#{content}, 
+			#{date}, 
+			#{img}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CallJobselEntity">
+		update call_jobsel 
+		<set>
+			<if test="source != null">`source` = #{source}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="phone != null">`phone` = #{phone}, </if>
+			<if test="adds != null">`adds` = #{adds}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="date != null">`date` = #{date}, </if>
+			<if test="img != null">`img` = #{img}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from call_jobsel where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from call_jobsel where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

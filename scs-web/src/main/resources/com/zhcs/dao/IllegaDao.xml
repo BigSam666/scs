@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.IllegaDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.IllegaEntity">
+		select
+			id, 		
+			cno, 		
+			illtm, 		
+			cause, 		
+			person, 		
+			amount,
+			score, 		
+			addr, 		
+			unit, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from illega where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.IllegaEntity">
+		select
+			i.id, 		
+			i.cno, 
+			(select c.cno from car c where c.id=i.cno) AS cnoText,			
+			i.illtm, 		
+			i.cause, 
+			(select bc.cnm from base_code bc where bc.id=i.cause) AS causeName,		
+			i.person,
+			(select s.name from sys_user s where s.id=i.person) AS personName, 		
+			i.amount, 
+			i.score,		
+			i.addr, 		
+			i.unit, 		
+			i.status, 		
+			i.crtid, 		
+			i.crttm, 		
+			i.updid, 		
+			i.updtm		
+		from illega i
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by i.${sidx} i.${order} 
+			</when>
+			<otherwise>
+				order by i.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.IllegaEntity">
+		SELECT
+			illega.id,
+			illega.cno,
+			car.cno AS cnoText,
+			illega.illtm,
+			illega.cause,
+			(SELECT	bc.cnm FROM	base_code bc WHERE bc.id = illega.cause) AS causeName,
+			illega.person,
+			sys_user.realname AS personName,
+			illega.amount,
+			illega.score,
+			illega.addr,
+			illega.unit,
+			illega. STATUS,
+			illega.crtid,
+			illega.crttm,
+			illega.updid,
+			illega.updtm
+		FROM
+			illega
+		LEFT JOIN sys_user ON sys_user.id = illega.person
+		INNER JOIN car ON car.id = illega.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(illega.illtm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(illega.illtm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) FROM
+			illega
+		LEFT JOIN sys_user ON sys_user.id = illega.person
+		INNER JOIN car ON car.id = illega.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(illega.illtm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(illega.illtm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.IllegaEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into illega
+		(
+			`cno`, 
+			`illtm`, 
+			`cause`, 
+			`person`, 
+			`amount`, 
+			`score`,
+			`addr`, 
+			`unit`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{cno}, 
+			#{illtm}, 
+			#{cause}, 
+			#{person}, 
+			#{amount}, 
+			#{score}, 
+			#{addr}, 
+			#{unit}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.IllegaEntity">
+		update illega 
+		<set>
+			<if test="cno != null">`cno` = #{cno}, </if>
+			<if test="illtm != null">`illtm` = #{illtm}, </if>
+			<if test="cause != null">`cause` = #{cause}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="amount != null">`amount` = #{amount}, </if>
+			<if test="score != null">`score` = #{score}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="unit != null">`unit` = #{unit}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from illega where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from illega where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

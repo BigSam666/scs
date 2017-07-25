@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.RepairDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.RepairEntity">
+		select
+			id, 		
+			cno, 		
+			rtm, 		
+			person, 		
+			cost, 		
+			addr, 		
+			store, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from repair where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.RepairEntity">
+		select
+			r.id, 		
+			r.cno, 	
+			(select c.cno from car c where c.id=r.cno) AS cnoText,		
+			r.rtm, 
+			(select group_concat(bc.cnm) from base_code bc,redetail rd 
+				where bc.no = rd.itemcode and bc.type = rd.itemtype and rd.reid = r.id) AS content,		
+			r.person, 
+			(select s.name from sys_user s where s.id=r.person) AS personName,			
+			r.cost, 		
+			r.addr, 		
+			r.store, 		
+			r.status, 		
+			r.crtid, 		
+			r.crttm, 		
+			r.updid, 		
+			r.updtm		
+		from repair r
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by r.${sidx} r.${order} 
+			</when>
+			<otherwise>
+				order by r.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.RepairEntity">
+		SELECT
+			`repair`.id,
+			`repair`.cno,
+			car.cno AS cnoText,
+			`repair`.rtm,
+			(SELECT	group_concat(bc.cnm) FROM base_code bc,	redetail rd	WHERE bc. NO = rd.itemcode AND bc.type = rd.itemtype AND rd.reid = `repair`.id) AS content,
+			`repair`.person,
+			sys_user.realname AS personName,
+			`repair`.cost,
+			`repair`.addr,
+			`repair`.store,
+			`repair`.`status`,
+			`repair`.crtid,
+			`repair`.crttm,
+			`repair`.updid,
+			`repair`.updtm
+		FROM
+			`repair`
+		LEFT JOIN sys_user ON sys_user.id = `repair`.person
+		INNER JOIN car ON car.id = `repair`.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(repair.rtm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(repair.rtm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) FROM
+			`repair`
+		LEFT JOIN sys_user ON sys_user.id = `repair`.person
+		INNER JOIN car ON car.id = `repair`.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(repair.rtm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(repair.rtm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.RepairEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into repair
+		(
+			`cno`, 
+			`rtm`, 
+			`person`, 
+			`cost`, 
+			`addr`, 
+			`store`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{cno}, 
+			#{rtm}, 
+			#{person}, 
+			#{cost}, 
+			#{addr}, 
+			#{store}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.RepairEntity">
+		update repair 
+		<set>
+			<if test="cno != null">`cno` = #{cno}, </if>
+			<if test="rtm != null">`rtm` = #{rtm}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="cost != null">`cost` = #{cost}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="store != null">`store` = #{store}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from repair where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from repair where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.WorkflowDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.WorkflowEntity">
+		select
+			id, 		
+			nodename, 		
+			nodeno, 		
+			nm, 		
+			number, 		
+			prevno, 		
+			nextno, 		
+			returnno, 		
+			roleids, 		
+			nodetype, 		
+			vseq, 		
+			vname, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from workflow where id = #{value}
+	</select>
+	
+	<select id="queryByNodeNo" resultType="com.zhcs.entity.WorkflowEntity">
+		select
+			id, 		
+			nodename, 		
+			nodeno, 		
+			nm, 		
+			number, 		
+			prevno, 		
+			nextno, 		
+			returnno, 		
+			roleids, 		
+			nodetype, 		
+			vseq, 		
+			vname, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from workflow where nodeno = #{nodeno}
+	</select>
+	
+	<select id="queryOtherNodeObject" resultType="com.zhcs.entity.WorkflowEntity">
+		select
+			id, 		
+			nodename, 		
+			nodeno, 		
+			nm, 		
+			number, 		
+			prevno, 		
+			nextno, 		
+			returnno, 		
+			roleids, 		
+			nodetype, 		
+			vseq, 		
+			vname, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from workflow where nodeno = (
+		select 
+		<choose>
+            <when test="flag!=null and flag == 0 "> returnno </when>
+            <otherwise>nextno</otherwise>
+        </choose>  
+		from workflow where nodeno = #{nodeno}
+		)
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.WorkflowEntity">
+		select
+			id, 		
+			nodename, 		
+			nodeno, 		
+			nm, 		
+			number, 		
+			prevno, 		
+			nextno, 		
+			returnno, 		
+			roleids, 		
+			nodetype, 		
+			vseq, 		
+			vname, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from workflow 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from workflow 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.WorkflowEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into workflow
+		(
+			`nodename`, 
+			`nodeno`, 
+			`nm`, 
+			`number`, 
+			`prevno`, 
+			`nextno`, 
+			`returnno`, 
+			`roleids`, 
+			`nodetype`, 
+			`vseq`, 
+			`vname`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{nodename}, 
+			#{nodeno}, 
+			#{nm}, 
+			#{number}, 
+			#{prevno}, 
+			#{nextno}, 
+			#{returnno}, 
+			#{roleids}, 
+			#{nodetype}, 
+			#{vseq}, 
+			#{vname}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.WorkflowEntity">
+		update workflow 
+		<set>
+			<if test="nodename != null">`nodename` = #{nodename}, </if>
+			<if test="nodeno != null">`nodeno` = #{nodeno}, </if>
+			<if test="nm != null">`nm` = #{nm}, </if>
+			<if test="number != null">`number` = #{number}, </if>
+			<if test="prevno != null">`prevno` = #{prevno}, </if>
+			<if test="nextno != null">`nextno` = #{nextno}, </if>
+			<if test="returnno != null">`returnno` = #{returnno}, </if>
+			<if test="roleids != null">`roleids` = #{roleids}, </if>
+			<if test="nodetype != null">`nodetype` = #{nodetype}, </if>
+			<if test="vseq != null">`vseq` = #{vseq}, </if>
+			<if test="vname != null">`vname` = #{vname}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from workflow where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from workflow where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.JobwarningDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.JobwarningEntity">
+		select
+			id, 		
+			project, 		
+			business, 		
+			btype, 		
+			wtype, 		
+			flag, 		
+			intv, 		
+			receive, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from jobwarning where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.JobwarningEntity">
+		select
+			id,
+			project,
+			business,
+			btype,
+			wtype,
+			flag,
+			intv,
+			receive,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from jobwarning
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+
+	<select id="queryListMap" resultType="java.util.Map">
+		SELECT
+			jo.id,
+			jo.project,
+			(SELECT sd.name from sys_department sd WHERE sd.id = jo.project) projectText,
+			jo.business,
+			(SELECT bc.cnm FROM base_code bc WHERE bc.type = 'biztype' and bc.no = jo.business) businessText,
+			jo.btype,
+			(SELECT bc.cnm FROM base_code bc WHERE bc.type = 'businesstype' and bc.no = jo.btype) btypeText,
+			jo.wtype,
+			(SELECT bc.cnm FROM base_code bc WHERE bc.type in( 'ewtype','adwi','vhew') and bc.no = jo.wtype and bc.rmk = (SELECT bc.cnm FROM base_code bc WHERE bc.type = 'businesstype' and bc.no = jo.btype)) wtypeText,
+			jo.flag,
+			jo.intv,
+			jo.receive,
+			jo.crtid,
+			jo.crttm,
+			jo.updid,
+			(SELECT su.realname FROM sys_user su WHERE su.id = '1' ) updidText,
+			jo.updtm
+		FROM
+			jobwarning jo
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by jo.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by jo.updtm desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from jobwarning 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.JobwarningEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into jobwarning
+		(
+			`project`, 
+			`business`, 
+			`btype`, 
+			`wtype`, 
+			`flag`, 
+			`intv`, 
+			`receive`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{project}, 
+			#{business}, 
+			#{btype}, 
+			#{wtype}, 
+			#{flag}, 
+			#{intv}, 
+			#{receive}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.JobwarningEntity">
+		update jobwarning 
+		<set>
+			<if test="project != null">`project` = #{project}, </if>
+			<if test="business != null">`business` = #{business}, </if>
+			<if test="btype != null">`btype` = #{btype}, </if>
+			<if test="wtype != null">`wtype` = #{wtype}, </if>
+			<if test="flag != null">`flag` = #{flag}, </if>
+			<if test="intv != null">`intv` = #{intv}, </if>
+			<if test="receive != null">`receive` = #{receive}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from jobwarning where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from jobwarning where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

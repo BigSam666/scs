@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>车载终端</title>
+#parse("sys/header.html")
+<style>
+	.qdevid {
+		display: inline-block;
+		width: 70%;
+	}
+	.row {
+		border-top: 0;
+	}
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<fieldset>
+			<legend>
+				<i class="fa fa-search"></i>&nbsp;条件筛选
+			</legend>
+			<div class="container-fluid">
+				<form class="" id="form-horizontal">
+					<div class="row">
+						<div class="col-sm-4">
+							<span class="alabel">设备ID：</span>
+							<input type="text" class="form-control qdevid" style="width:65%;" v-model="q.qdevid"/>
+						</div>
+						<div class="col-sm-4">
+						</div>
+						<div class="col-sm-2">
+							<a class="btn btn-info" @click="query">查询</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</fieldset>
+		<div class="grid-btn">
+			#if($shiro.hasPermission("carterminal:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("carterminal:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("carterminal:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">设备厂商</div>
+   	   	<div class="col-sm-10">
+      <input id="devfrim" class="easyui-combobox" name="devfrim" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">设备型号</div>
+   	   	<div class="col-sm-10">
+      <input id="devmodel" class="easyui-combobox" name="devmodel" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">设备ID</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="carterminal.devid" name="devid" placeholder="设备ID"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">2G/SIM卡号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="carterminal.g2no" name="g2no" placeholder="2G/SIM卡号"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">3G/SIM卡号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="carterminal.g3no" name="g3no" placeholder="3G/SIM卡号"/>
+    </div>
+       	</div>
+   																	#if($shiro.hasPermission("carterminal:update") || $shiro.hasPermission("carterminal:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/carterminal/carterminal.js?_${date.systemTime}"></script>
+</body>
+</html>

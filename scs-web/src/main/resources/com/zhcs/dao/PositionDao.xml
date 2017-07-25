@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.PositionDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.PositionEntity">
+		select
+			id, 		
+			lng, 		
+			lat, 		
+			prec, 		
+			oob, 		
+			uid, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from position where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.PositionEntity">
+		select
+			id, 		
+			lng, 		
+			lat, 		
+			prec, 		
+			oob, 		
+			uid, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from position 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="getUserMsgByPosition" resultType="java.util.Map">
+		select
+			user.id, 
+			user.wechatid,
+			user.name, 
+			user.realname, 
+			user.email, 
+			user.mobile, 
+			CalculatingDistance (pos.lat, pos.lng, #{lat}, #{lng}) distance,
+			pos.lat,
+			pos.lng,
+			pos.oob
+		from sys_user user, position pos, sys_user_role sur, sys_role role 
+		where 
+		user.id = pos.uid
+		and sur.userid = user.id 
+		and role.id = sur.roleid 
+		and CalculatingDistance (pos.lat, pos.lng, #{lat}, #{lng}) &lt;= #{radius} 
+		and to_days(now()) = to_days(pos.crttm) 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by user.${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by user.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="getUserMsgByPositionTotal" resultType="int">
+		select
+			count(*) 
+		from sys_user user, position pos 
+		where 
+		user.id = pos.uid
+		and CalculatingDistance (pos.lat, pos.lng, #{lat}, #{lng}) &lt;= #{radius} 
+		and to_days(now()) = to_days(pos.crttm) 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from position 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.PositionEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into position
+		(
+			`lng`, 
+			`lat`, 
+			`prec`, 
+			`oob`, 
+			`uid`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{lng}, 
+			#{lat}, 
+			#{prec}, 
+			#{oob}, 
+			#{uid}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.PositionEntity">
+		update position 
+		<set>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="prec != null">`prec` = #{prec}, </if>
+			<if test="oob != null">`oob` = #{oob}, </if>
+			<if test="uid != null">`uid` = #{uid}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from position where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from position where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

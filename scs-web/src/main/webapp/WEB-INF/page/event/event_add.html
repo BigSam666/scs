@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>新增事件</title>
+#parse("sys/header.html")
+<script src="http://webapi.amap.com/maps?v=1.3&key=798c6e4c99c76881ac4de9b2791bc277&plugin=AMap.Autocomplete,AMap.Geocoder"></script>
+<script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+</head>
+<body>
+	<div class="panel panel-default">
+		<div class="panel-heading">新增事件</div>
+		<form class="form-horizontal" style="float:left; width:31%;">
+			<div class="form-group">
+				<div class="col-sm-2 control-label">业务板块</div>
+				<div class="col-sm-10">
+		      		<input id="serviceType" class="easyui-combobox" name="busseg">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">事件来源</div>
+				<div class="col-sm-10">
+		      		<input id="sourType" class="easyui-combobox" name="sour">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">来源对象</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" name="sourOject" on readonly="readonly" placeholder="来源对象" />
+					<input type="hidden" name="userid" />
+        			<!-- <span class="glyphicon glyphicon-download form-control-feedback"></span> -->
+					<span class="required">由于“事件来源”为“市民爆料”时“来源对象”允许手动输入，所以“来源对象”选择方式改成“来源对象”文本框双击</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">联系电话</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" name="mobile" readonly="readonly" placeholder="联系电话" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">详细内容</div>
+				<div class="col-sm-10">
+	      		<textarea class="textarea contentArea" placeholder="详细内容" name="des" style="height:50px;"></textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">位置</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" placeholder="请输入关键字进行位置搜索" id="tipinput">
+					<input type="hidden" name="lng" >
+					<input type="hidden" name="lat" >
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">补充地址</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" name="addrs" placeholder="补充地址" />
+				</div>
+			</div>
+			#if($shiro.hasPermission("event:add"))
+			<div class="form-group">
+				<div class="col-sm-2 control-label"></div>
+				<input type="button" class="btn btn-primary" onclick="javascript:save()" value="确定" />
+			</div>
+			#end
+		</form>
+		<div style="width:68%; position:relative; float:right; height:35em;">
+			<div id="container"></div>
+		</div>
+	</div>
+<!-- 队长 -->
+<div id="deptLayer1" style="display: none;padding:10px;">
+	<ul id="deptTreeCaptain" class="ztree"></ul>
+</div>
+	<script src="${rc.contextPath}/js/event/event_add.js?_${date.systemTime}"></script>
+</body>
+</html>

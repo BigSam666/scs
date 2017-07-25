@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>基础设置</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div class="row" id="rrapp">
+		<form class="form-horizontal">
+			<div class="grid-btn">
+				<fieldset>
+					<legend>
+						<i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;车辆预警设置
+					</legend>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">滞留:</label>
+						<div class="col-xs-2">
+							<input type="text" class="form-control" name="czm" v-model="jcsz.czm" placeholder="米">
+						</div>
+						<div class="col-xs-3">
+							<p class="form-control-static">米范围内</p>
+						</div>
+						<div class="col-xs-2">
+							<input type="text" class="form-control" name="czf" v-model="jcsz.czf" placeholder="分钟">
+						</div>
+						<div class="col-xs-3">
+							<p class="form-control-static">分钟以上</p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">越界:</label>
+						<div class="col-xs-2">
+							<p class="form-control-static">超过</p>
+						</div>
+						<div class="col-xs-2">
+							<input type="text" class="form-control" name="cym" v-model="jcsz.cym" placeholder="米">
+						</div>
+						<div class="col-xs-2">
+							<p class="form-control-static">米</p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">超速:</label>
+						<div class="col-xs-2">
+							<input type="text" class="form-control" name="ccg" v-model="jcsz.ccg" placeholder="公里">
+						</div>
+						<div class="col-xs-2">
+							<p class="form-control-static">km/时</p>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<div class="grid-btn">
+				<fieldset>
+					<legend>
+						<i class="fa fa-id-card-o" aria-hidden="true"></i>&nbsp;考勤预警设置
+					</legend>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">滞留:</label>
+						<div class="col-xs-2">
+							<input type="text" class="form-control" name="kzm" v-model="jcsz.kzm" placeholder="米">
+						</div>
+						<div class="col-xs-3">
+							<p class="form-control-static">米范围内</p>
+						</div>
+						<div class="col-xs-2">
+							<input type="text" class="form-control" name="kzf" v-model="jcsz.kzf" placeholder="分钟">
+						</div>
+						<div class="col-xs-3">
+							<p class="form-control-static">分钟以上</p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-2 control-label">越界:</label>
+						<div class="col-xs-2">
+							<p class="form-control-static">超过</p>
+						</div>
+						<div class="col-xs-2">
+							<input type="text" class="form-control" name="kym" v-model="jcsz.kym" placeholder="米">
+						</div>
+						<div class="col-xs-2">
+							<p class="form-control-static">米</p>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<div class="box-footer col-md-6">
+				<button type="button" @click="getId()" class="btn btn-block btn-success col-md-2 col-md-offset-6">保存设置</button>
+			</div>
+		</form>
+	</div>
+<script src="${rc.contextPath}/js/basissetting/basissetting.js?_${date.systemTime}"></script>
+</body>
+</html>

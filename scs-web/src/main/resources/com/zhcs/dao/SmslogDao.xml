@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.SmslogDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.SmslogEntity">
+		select
+			id, 		
+			receiver, 		
+			type, 		
+			tid, 		
+			content, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from smslog where id = #{value}
+	</select>
+
+	<select id="queryObject2" resultType="java.util.Map">
+		select
+			id, 		
+			receiver, 		
+			(select name from sys_user where id = receiver) unm,  
+			type, 		
+			tid, 		
+			content, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from smslog where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.SmslogEntity">
+		select
+			id, 		
+			receiver, 	
+			type, 		
+			tid, 		
+			content, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from smslog 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList2" resultType="java.util.Map">
+		select
+			id, 		
+			receiver, 	
+			(select name from sys_user where id = receiver) unm,  		
+			type, 		
+			tid, 		
+			content, 		
+			status, 		
+			log, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from smslog 
+		where 1=1 
+		
+		<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(smslog.crttm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(smslog.crttm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+		
+		
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by crttm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from smslog where 1=1 
+		
+		<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(smslog.crttm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(smslog.crttm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+		
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.SmslogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into smslog
+		(
+			`receiver`, 
+			`type`, 
+			`tid`, 
+			`content`, 
+			`status`, 
+			`log`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{receiver}, 
+			#{type}, 
+			#{tid}, 
+			#{content}, 
+			#{status}, 
+			#{log}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.SmslogEntity">
+		update smslog 
+		<set>
+			<if test="receiver != null">`receiver` = #{receiver}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="tid != null">`tid` = #{tid}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="log != null">`log` = #{log}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from smslog where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from smslog where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

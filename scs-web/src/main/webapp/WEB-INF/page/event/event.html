@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>案件</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("event:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("event:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("event:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">业务板块</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="event.busseg" name="busseg" placeholder="业务板块"/>
+    </div>
+       	</div>
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">事件编号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="event.no" name="no" placeholder="事件编号"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">事件来源</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="event.sour" name="sour" placeholder="事件来源"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">派单时间</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="event.distm" name="distm" placeholder="派单时间"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">处理图片</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="event.img" name="img" placeholder="处理图片"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">工作反馈</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="event.des" name="des" placeholder="工作反馈"/>
+    </div>
+       	</div>
+   																	#if($shiro.hasPermission("event:update") || $shiro.hasPermission("event:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/event/event.js?_${date.systemTime}"></script>
+</body>
+</html>

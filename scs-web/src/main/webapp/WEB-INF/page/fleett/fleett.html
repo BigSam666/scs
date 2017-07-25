@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>车队管理</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<fieldset>
+			<legend><i class="fa fa-search"></i>&nbsp;查询条件</legend>
+			<div class="form-group ">
+			   	<div class="col-sm-3">
+					<input type="text" class="form-control" v-model="q.condition" @keyup.enter="query" placeholder="请输入车队名称/车队队长">
+			    </div>
+			   	<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+			    </div>
+			</div>
+		</fieldset>
+		<div class="grid-btn">
+			#if($shiro.hasPermission("fleett:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("fleett:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("fleett:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">名称</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="fleett.nm" name="nm" placeholder="名称"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">所属部门</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="fleett.dept" name="dept" placeholder="所属部门"/> -->
+      <input type="hidden" class="form-control" style="cursor:pointer;" v-model="fleett.dept" name="dept" readonly="readonly" placeholder="company"/>
+      <input type="text" class="form-control" style="cursor:pointer;" v-model="fleett.deptName" @click="deptTree" readonly="readonly" placeholder="company"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">队长</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="fleett.captain" name="captain" placeholder="队长"/> -->
+			<input type="hidden" v-model="fleett.captain" name="captain" />
+		    <input type="text" class="form-control" style="cursor:pointer;" v-model="fleett.captainName" @click="deptTreeCaptain" readonly="readonly" placeholder="队长"/>
+    </div>
+       	</div>
+   				   	<div class="form-group" style="display: none">
+   	<div class="col-sm-2 control-label">状态</div>
+   	   	<label class="radio-inline">
+	  <input type="radio" name="status" value="1" v-model="fleett.status"/> 有效
+	</label>
+   	<label class="radio-inline">
+	  <input type="radio" name="status" value="0" v-model="fleett.status"/> 无效
+	</label>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">备注</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="fleett.rmk" name="rmk" placeholder="备注"/>
+    </div>
+       	</div>
+   		#if($shiro.hasPermission("fleett:update") || $shiro.hasPermission("fleett:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+<!-- 部门菜单 -->
+<div id="deptLayer" style="display: none;padding:10px;">
+	<ul id="deptTree" class="ztree"></ul>
+</div>
+<!-- 队长 -->
+<div id="deptLayer1" style="display: none;padding:10px;">
+	<ul id="deptTreeCaptain" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/fleett/fleett.js?_${date.systemTime}"></script>
+</body>
+</html>

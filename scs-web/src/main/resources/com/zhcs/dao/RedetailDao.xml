@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.RedetailDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.RedetailEntity">
+		select
+			id, 		
+			reid, 		
+			itemtype, 		
+			itemcode, 		
+			money, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from redetail where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.RedetailEntity">
+		select
+			id, 		
+			reid, 		
+			itemtype, 		
+			itemcode, 		
+			money, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from redetail 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListByReid" resultType="com.zhcs.entity.RedetailEntity">
+		select
+			id, 
+			reid,		
+			itemtype, 		
+			itemcode, 		
+			money, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from redetail 
+		where reid = #{reid}
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from redetail 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.RedetailEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into redetail
+		(
+			`reid`, 
+			`itemtype`, 
+			`itemcode`, 
+			`money`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{reid}, 
+			#{itemtype}, 
+			#{itemcode}, 
+			#{money}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+		insert into redetail
+		(
+			`reid`,
+			`itemtype`, 
+			`itemcode`, 
+			`money`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator="," >
+		(
+			#{item.reid},
+			#{item.itemtype}, 
+			#{item.itemcode}, 
+			#{item.money}, 
+			#{item.status}, 
+			#{item.crtid}, 
+			#{item.crttm}, 
+			#{item.updid}, 
+			#{item.updtm}
+		)
+		</foreach>
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.RedetailEntity">
+		update redetail 
+		<set>
+			<if test="reid != null">`reid` = #{reid}, </if>
+			<if test="itemtype != null">`itemtype` = #{itemtype}, </if>
+			<if test="itemcode != null">`itemcode` = #{itemcode}, </if>
+			<if test="money != null">`money` = #{money}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from redetail where id = #{value}
+	</delete>
+	
+	<delete id="deleteByReid">
+		delete from redetail where reid = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from redetail where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

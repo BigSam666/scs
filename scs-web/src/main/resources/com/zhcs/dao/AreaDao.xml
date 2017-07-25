@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.AreaDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.AreaEntity">
+		select
+		id, 		
+		no, 		
+		type, 		
+		cnm, 		
+		enm, 		
+		abbrnm, 		
+		pno, 		
+		zno, 		
+		crtid, 		
+		crttm, 		
+		updid, 		
+		updtm		
+		from area where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.AreaEntity">
+		select
+		id, 		
+		no, 		
+		type, 		
+		cnm, 		
+		enm, 		
+		abbrnm, 		
+		pno, 		
+		zno, 		
+		crtid, 		
+		crttm, 		
+		updid, 		
+		updtm		
+		from area 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryAreaListByNo" resultType="java.util.Map">
+		select 
+			no no, 
+			no id, 
+			cnm cnm, 
+			cnm text,
+			pno pno,
+			pno pid
+		from area 
+		where pno = #{value}
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from area 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.AreaEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into area
+		(
+			`no`, 
+			`type`, 
+			`cnm`, 
+			`enm`, 
+			`abbrnm`, 
+			`pno`, 
+			`zno`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{no}, 
+			#{type}, 
+			#{cnm}, 
+			#{enm}, 
+			#{abbrnm}, 
+			#{pno}, 
+			#{zno}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.AreaEntity">
+		update area 
+		<set>
+			<if test="no != null">`no` = #{no}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="cnm != null">`cnm` = #{cnm}, </if>
+			<if test="enm != null">`enm` = #{enm}, </if>
+			<if test="abbrnm != null">`abbrnm` = #{abbrnm}, </if>
+			<if test="pno != null">`pno` = #{pno}, </if>
+			<if test="zno != null">`zno` = #{zno}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from area where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from area where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

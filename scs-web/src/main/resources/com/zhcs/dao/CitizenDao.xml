@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CitizenDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CitizenEntity">
+		select
+			id, 		
+			wechatid, 		
+			mobile, 		
+			nm, 		
+			gender, 		
+			faceimg, 		
+			addr, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from citizen where id = #{value}
+	</select>
+
+	<select id="queryObjectByMobile" resultType="com.zhcs.entity.CitizenEntity">
+		select
+			id, 		
+			wechatid, 		
+			mobile, 		
+			nm, 		
+			gender, 		
+			faceimg, 		
+			addr, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from citizen where mobile = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CitizenEntity">
+		select
+			id, 		
+			wechatid, 		
+			mobile, 		
+			nm, 		
+			gender, 		
+			faceimg, 		
+			addr, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from citizen 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="getUserList" resultType="java.util.Map">
+		select
+			id id, 		
+			nm nm,
+			nm text  		
+		from citizen 
+	</select>
+	
+	<select id="getUserTree" resultType="java.util.Map">
+		select
+			id userid,
+			0 pid,
+			nm,
+			nm name,
+			mobile id
+		from
+			citizen
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from citizen 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CitizenEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into citizen
+		(
+			`wechatid`, 
+			`mobile`, 
+			`nm`, 
+			`gender`, 
+			`faceimg`, 
+			`addr`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{wechatid}, 
+			#{mobile}, 
+			#{nm}, 
+			#{gender}, 
+			#{faceimg}, 
+			#{addr}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CitizenEntity">
+		update citizen 
+		<set>
+			<if test="wechatid != null">`wechatid` = #{wechatid}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="nm != null">`nm` = #{nm}, </if>
+			<if test="gender != null">`gender` = #{gender}, </if>
+			<if test="faceimg != null">`faceimg` = #{faceimg}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from citizen where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from citizen where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

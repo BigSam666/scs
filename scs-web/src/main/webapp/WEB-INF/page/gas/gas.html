@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>油耗管理</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<fieldset>
+				<legend>
+					<i class="fa fa-search"></i>&nbsp;查询条件
+				</legend>
+
+				<div class="col-sm-3">
+					<!-- <label class="col-sm-4 control-label">下单结束时间：</label> -->
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="q.condition"
+							@keyup.enter="query" placeholder="请输入车牌号">
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<label class="myLabel-content" style="margin-top: 8px;">日期范围：</label>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="starttime"
+							placeholder="开始日期" onClick="WdatePicker()" />
+					</div>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="endtime"
+							placeholder="结束日期" onClick="WdatePicker()" />
+					</div>
+				</div>
+
+
+				<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+				</div>
+
+			</fieldset>
+	
+		<div class="grid-btn">
+			#if($shiro.hasPermission("gas:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("gas:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("gas:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">车牌号</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="gas.cno" name="cno" placeholder="车牌号"/> -->
+     	 <input id="cno" class="easyui-combobox" name="cno" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">加油日期</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" name="gastm" id="gastm" placeholder="加油日期" onClick="WdatePicker()" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">加油人员</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="gas.person" name="person" placeholder="办理人员"/> -->
+			<input type="hidden" v-model="gas.person" name="person" />
+		    <input type="text" class="form-control" style="cursor:pointer;" v-model="gas.personName" @click="personTree" readonly="readonly" placeholder="加油人员"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">加油单价</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="gas.price" name="price" placeholder="加油单价"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">加油单位</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="gas.unit" name="unit" placeholder="加油单位"/> -->
+		<input id="unit" class="easyui-combobox" name="unit" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">加油类型</div>
+   	   	<div class="col-sm-10">
+		<input id="type" class="easyui-combobox" name="type" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">数量</div>
+   	   	<div class="col-sm-10">
+		<input type="text" class="form-control" v-model="gas.num" name="num" placeholder="数量"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">加油费用</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="gas.cost" name="cost" placeholder="加油费用" readonly="true"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">加油地点</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="gas.addr" name="addr" placeholder="加油地点"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">起里程数</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="gas.bmile" name="bmile" placeholder="起里程数"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">止里程数</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="gas.emile" name="emile" placeholder="止里程数"/>
+    </div>
+       	</div>
+   				   	<div class="form-group" style="display: none;">
+   	<div class="col-sm-2 control-label">状态</div>
+   	   	<label class="radio-inline">
+	  <input type="radio" name="status" value="1" v-model="gas.status"/> 有效
+	</label>
+   	<label class="radio-inline">
+	  <input type="radio" name="status" value="0" v-model="gas.status"/> 无效
+	</label>
+       	</div>
+   																	#if($shiro.hasPermission("gas:update") || $shiro.hasPermission("gas:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+<!-- 办理人员 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+<script src="${rc.contextPath}/js/gas/gas.js?_${date.systemTime}"></script>
+</body>
+</html>

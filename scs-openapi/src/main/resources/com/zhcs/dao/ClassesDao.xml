@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.ClassesDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.ClassesEntity">
+		select
+			id,
+			business,
+			classes,
+			DATE_FORMAT(starttime, '%T') starttime,
+			DATE_FORMAT(emdtime, '%T') emdtime,
+			remark,
+			(SELECT name FROM sys_department WHERE id = pjdept) pjdept,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		FROM
+		classes where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.ClassesEntity">
+		select
+			id,
+			business,
+			classes,
+			DATE_FORMAT(starttime, '%T') starttime,
+			DATE_FORMAT(emdtime, '%T') emdtime,
+			remark,
+			(SELECT name FROM sys_department WHERE id = pjdept) pjdept,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		FROM
+		classes where business = #{business}
+		order by updtm desc
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryObjectMap" resultType="java.util.Map">
+		select
+			id,
+			(SELECT cnm from base_code WHERE no = business and type = 'biztype') business,
+			classes,
+			DATE_FORMAT(starttime, '%T') starttime,
+			DATE_FORMAT(emdtime, '%T') emdtime,
+			remark,
+			(SELECT name FROM sys_department WHERE id = pjdept) pjdept,
+			(SELECT realname FROM sys_user WHERE id = crtid) crtid,
+			crttm,
+			updid,
+			updtm
+		FROM
+		classes where id = #{value}
+	</select>
+
+	<select id="queryListMap" resultType="java.util.Map">
+		SELECT
+			id,
+			(SELECT cnm from base_code WHERE no = business and type = 'biztype') business,
+			classes,
+			DATE_FORMAT(starttime, '%T') starttime,
+			DATE_FORMAT(emdtime, '%T') emdtime,
+			remark,
+			(SELECT name FROM sys_department WHERE id = pjdept) pjdept,
+			(SELECT realname FROM sys_user WHERE id = crtid) crtid,
+			crttm,
+			updid,
+			updtm
+		FROM
+			classes
+		<where>
+			<if test="name != null and name != ''">
+				and concat_ws(',',(SELECT name FROM sys_department WHERE id = pjdept), (SELECT realname FROM sys_user WHERE id = crtid)) like concat('%',#{name},'%') 
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by updtm desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from classes
+		<where>
+			<if test="business != null">
+				business = #{business}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="save" parameterType="com.zhcs.entity.ClassesEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into classes
+		(
+		`business`,
+		`classes`,
+		`starttime`,
+		`emdtime`,
+		`remark`,
+		`pjdept`,
+		`crtid`,
+		`crttm`,
+		`updid`,
+		`updtm`
+		)
+		values
+		(
+		#{business},
+		#{classes},
+		#{starttime},
+		#{emdtime},
+		#{remark},
+		#{pjdept},
+		#{crtid},
+		#{crttm},
+		#{updid},
+		#{updtm}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.zhcs.entity.ClassesEntity">
+		update classes
+		<set>
+			<if test="business != null">`business` = #{business}, </if>
+			<if test="classes != null">`classes` = #{classes}, </if>
+			<if test="starttime != null">`starttime` = #{starttime}, </if>
+			<if test="emdtime != null">`emdtime` = #{emdtime}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="pjdept != null">`pjdept` = #{pjdept}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from classes where id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from classes where id in
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

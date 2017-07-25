@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>保养管理</title>
+#parse("sys/header.html")
+<style type="text/css">
+.smaintain .bmaintain {
+	overflow-x:false;
+}
+.bmaintain .tname,.smaintain .tname{
+	width: 180px;
+ 	border-left: none;
+}
+.bmaintain .tvalue,.smaintain .tvalue{
+ 	border-right: none;
+}
+.form-div th {
+    font-weight: bold;
+}
+.smaintain-table-left, .bmaintain-table-left {
+	border-left: none !important;
+	font-weight: bold;
+}
+.smaintain-table-right, .bmaintain-table-right {
+	border-right: none !important;
+	font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		
+		<fieldset>
+				<legend>
+					<i class="fa fa-search"></i>&nbsp;查询条件
+				</legend>
+
+				<div class="col-sm-3">
+					<!-- <label class="col-sm-4 control-label">下单结束时间：</label> -->
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="q.condition"
+							@keyup.enter="query" placeholder="请输入车牌号">
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<label class="myLabel-content" style="margin-top: 8px;">日期范围：</label>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="starttime"
+							placeholder="开始日期" onClick="WdatePicker()" />
+					</div>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="endtime"
+							placeholder="结束日期" onClick="WdatePicker()" />
+					</div>
+				</div>
+
+
+				<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+				</div>
+
+			</fieldset>
+	
+		<div class="grid-btn">
+			#if($shiro.hasPermission("maintain:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("maintain:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("maintain:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">车牌号</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="maintain.cno" name="cno" placeholder="车牌号"/> -->
+			<input id="cno" class="easyui-combobox" name="cno" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">保养日期</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="maintain.mtm" name="mtm" placeholder="保养日期"/> -->
+		<input type="text" class="form-control" name="mtm" id="mtm" placeholder="保养日期" onClick="WdatePicker()" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">预计下次保养</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="maintain.mtm" name="mtm" placeholder="保养日期"/> -->
+		<input type="text" class="form-control" name="ntm" id="ntm" placeholder="预计下次保养" onClick="WdatePicker()" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">保养里程</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="maintain.mile" name="mile" placeholder="保养里程"/>
+    </div>
+       	</div>
+       	   			<div class="form-group">
+   	<div class="col-sm-2 control-label">保养明细</div>
+   	   	<div class="col-sm-10">
+   	   	<input type="hidden" id="insdetail" name="mtdetail" v-model="maintain.mtdetail" />
+      <input type="text" class="form-control" placeholder="请选择" @click="mtdetail" v-model="maintain.mtdetailText" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">保养人员</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="maintain.person" name="person" placeholder="保养人员"/> -->
+		<input type="hidden" v-model="maintain.person" name="person" />
+	    <input type="text" class="form-control" style="cursor:pointer;" v-model="maintain.personName" @click="personTree" readonly="readonly" placeholder="保养人员"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">保养费用</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="maintain.cost" name="cost" placeholder="保养费用" readonly="readonly"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">保养门店</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="maintain.store" name="store" placeholder="保养门店"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">保养地点</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="maintain.addr" name="addr" placeholder="保养地点"/>
+    </div>
+       	</div>
+   				   	<div class="form-group" style="display: none;">
+   	<div class="col-sm-2 control-label">状态</div>
+   	   	<label class="radio-inline">
+	  <input type="radio" name="status" value="1" v-model="maintain.status"/> 有效
+	</label>
+   	<label class="radio-inline">
+	  <input type="radio" name="status" value="0" v-model="maintain.status"/> 无效
+	</label>
+       	</div>
+   																	#if($shiro.hasPermission("maintain:update") || $shiro.hasPermission("maintain:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+<!-- 保养人员 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+<!-- 保养明细 -->
+<div id="mtdetailLayer" style="display: none;text-indent: 1em;">
+	<form id="mtdetail-form">
+	<!-- 小保养 -->
+	<div class="smaintain form-div">
+		<table class="smaintain-table">
+			<tr><th>强制保险</th></tr>
+			<tr class="table1">
+				<td class="smaintain-table-left">款项</td>
+				<td class="smaintain-table-right">金额</td>
+			</tr>
+		</table>
+	</div>
+	<!-- 大保养 -->
+	<div class="bmaintain form-div">
+		<table class="bmaintain-table">
+			<tr><th>商业保险</th></tr>
+			<tr class="table2">
+				<td class="bmaintain-table-left">款项</td>
+				<td class="bmaintain-table-right">金额</td>
+			</tr>
+		</table>
+	</div>
+	</form>
+</div>
+<script src="${rc.contextPath}/js/maintain/maintain.js?_${date.systemTime}"></script>
+</body>
+</html>

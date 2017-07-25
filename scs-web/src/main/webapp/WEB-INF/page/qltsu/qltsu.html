@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>质量督导</title>
+#parse("sys/header.html")
+<link rel="stylesheet" type="text/css" href="${rc.contextPath}/statics/plugins/diyUpload/css/webuploader.css">
+<link rel="stylesheet" type="text/css" href="${rc.contextPath}/statics/plugins/diyUpload/css/diyUpload.css">
+<script type="text/javascript" src="${rc.contextPath}/statics/plugins/diyUpload/js/webuploader.html5only.min.js"></script>
+<script type="text/javascript" src="${rc.contextPath}/statics/plugins/diyUpload/js/diyUpload.js"></script>
+<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+<script src="http://webapi.amap.com/maps?v=1.3&key=798c6e4c99c76881ac4de9b2791bc277&plugin=AMap.Autocomplete,AMap.Geocoder,AMap.MouseTool"></script>
+<script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			<fieldset>
+				<legend>
+					<i class="fa fa-search"></i>&nbsp;查询条件
+				</legend>
+				<div class="form-group col-sm-2">
+					<div class="col-sm-8">
+						<input type="text" class="form-control" v-model="q.name" @keyup.enter="query" placeholder="职员姓名">
+					</div>
+					<div class="col-sm-2">
+						<a class="btn btn-info" @click="query">查询</a>
+					</div>
+				</div>
+			</fieldset>
+			#if($shiro.hasPermission("qltsu:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("qltsu:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("qltsu:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">业务板块</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" placeholder="清扫保洁" readonly="readonly"/>
+    </div>
+       	</div>
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">扣分类型</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="qltsu.scoretype" name="scoretype" placeholder="扣分类型"/> -->
+		<input id="scoretype" class="easyui-combobox" name="scoretype" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">地址</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="qltsu.addr" name="addr" placeholder="请在右侧地图上选择地址" readonly="readonly"/>
+      <input type="hidden" class="form-control" v-model="qltsu.lng" name="lng" placeholder="经度"/>
+      <input type="hidden" class="form-control" v-model="qltsu.lat" name="lat" placeholder="纬度"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">扣分</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="qltsu.score" name="score" placeholder="扣分"/> -->
+			<input id="score" class="easyui-combobox" name="score" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">扣分时间</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="qltsu.stime" name="stime" placeholder="扣分时间"/> -->
+			<input type="text" class="form-control" name="stime" id="stime" placeholder="扣分时间" onClick="WdatePicker({isShowWeek:true,isShowClear:false,readOnly:true,dateFmt:'yyyy-MM-dd HH:mm:ss'})" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">选人</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="qltsu.person" name="person" placeholder="选人"/> -->
+			<input type="hidden" v-model="qltsu.person" name="person" />
+		    <input type="text" class="form-control" style="cursor:pointer;" v-model="qltsu.personName" @click="personTree" readonly="readonly" placeholder="选人"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">详细地址</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="qltsu.accaddr" name="accaddr" placeholder="精确地址"/>
+    </div>
+       	</div>
+<!--    				   	<div class="form-group"> -->
+<!--    	<div class="col-sm-2 control-label">现场照片</div> -->
+<!--    	   	<div class="col-sm-10"> -->
+<!--       <input type="hidden" class="form-control" v-model="qltsu.img" name="img" placeholder="现场照片"/> -->
+<!--       <div id="img" ></div> -->
+<!--     </div> -->
+<!--        	</div> -->
+
+
+			<div class="form-group" v-show="showUploadPic">
+   				<div class="col-sm-2 control-label">选择图片</div>
+   	   			<div class="col-sm-10">
+   	   				<input type="hidden" class="form-control" v-model="qltsu.img" name="img" placeholder="现场照片"/>
+					<div id="">
+						<div id="uploadPic" ></div>
+					</div>
+    			</div>
+       		</div>
+       		
+   			<div class="form-group" v-show="showPic">
+   				<div class="col-sm-2 control-label">
+   					<span v-show="showUploadPic">原</span>图片
+   				</div>
+   	   			<div class="col-sm-10">
+      				<img alt="" src="" id="showPic">
+    			</div>
+       		</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">扣分说明</div>
+   	   	<div class="col-sm-10">
+      <textarea class="form-control" v-model="qltsu.expl" name="expl" placeholder="【2-50个汉字】" rows="10" cols="30"></textarea>
+    </div>
+       	</div>
+   				   	<div class="form-group" style="display: none;">
+   	<div class="col-sm-2 control-label">状态</div>
+   	   	<label class="radio-inline">
+	  <input type="radio" name="status" value="1" v-model="qltsu.status"/> 有效
+	</label>
+   	<label class="radio-inline">
+	  <input type="radio" name="status" value="0" v-model="qltsu.status" checked="checked"/> 无效
+	</label>
+       	</div>
+   																	#if($shiro.hasPermission("qltsu:update") || $shiro.hasPermission("qltsu:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+<div class="amap" style="position: absolute;top: 45px;right: 0px;height: 420px;width: 50%;display: none;">
+	<div id="container"></div>
+	<div id="myPageTop">
+	    <table>
+	        <tr>
+	            <td>
+	                <label>按关键字搜索：</label>
+	            </td>
+	            <td class="column2">
+	                <label>左击获取经纬度：</label>
+	            </td>
+	        </tr>
+	        <tr>
+	            <td>
+	                <input type="text" placeholder="请输入关键字进行搜索" id="tipinput">
+	            </td>
+	            <td class="column2">
+	                <input type="text" readonly="true" id="lnglat">
+	            </td>
+	        </tr>
+	    </table>
+	</div>
+</div>
+<!-- 选人 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/qltsu/qltsu.js?_${date.systemTime}"></script>
+</body>
+</html>

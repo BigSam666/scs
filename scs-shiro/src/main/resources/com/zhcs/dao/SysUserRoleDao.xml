@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.SysUserRoleDao">
+
+	<select id="queryList" resultType="com.zhcs.entity.SysUserRoleEntity">
+		select 
+			id,
+			userid,
+			roleid,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from sys_user_role 
+		<where>
+			<if test="userid != null">
+				userid = #{userid}
+			</if>
+		</where>
+	</select>
+ 
+	<insert id="save">
+		insert into sys_user_role
+		(
+			`userid`, 
+			`roleid`,
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		<foreach collection="roleIdList" item="item" index="index" separator="," >
+		(
+			#{userid}, 
+			#{item}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+		</foreach>
+	</insert>
+	
+	<delete id="delete">
+		delete from sys_user_role where userid = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from sys_user_role where userid in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="queryRoleIdList" resultType="Long">
+		select roleid from sys_user_role where userid = #{value}
+	</select>
+	
+	<select id="queryRoleText" resultType="String">
+		select 
+			group_concat(name) RoleText 
+		from sys_role
+		where id in
+		<foreach collection="roleIds" item="item" index="index" open="(" separator="," close=")" >
+		#{item}
+		</foreach>
+	</select>
+</mapper>

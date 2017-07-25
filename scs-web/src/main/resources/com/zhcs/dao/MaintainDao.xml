@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.MaintainDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.MaintainEntity">
+		select
+			id, 		
+			cno, 		
+			mtm,
+			ntm, 		
+			mile, 		
+			person, 		
+			cost, 		
+			addr, 		
+			store, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from maintain where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.MaintainEntity">
+		select
+			m.id, 		
+			m.cno, 
+			(select c.cno from car c where c.id=m.cno) AS cnoText,			
+			m.mtm, 	
+			m.ntm,	
+			m.mile, 		
+			m.person,
+			(select s.name from sys_user s where s.id=m.person) AS personName,	
+			m.cost,
+			m.addr,
+			m.store, 		
+			m.status, 		
+			m.crtid, 		
+			m.crttm, 		
+			m.updid, 		
+			m.updtm		
+		from maintain m
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by m.${sidx} m.${order} 
+			</when>
+			<otherwise>
+				order by m.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.MaintainEntity">
+		SELECT
+			maintain.id,
+			maintain.cno,
+			car.cno AS cnoText,
+			maintain.mtm,
+			maintain.ntm,
+			maintain.mile,
+			maintain.person,
+			sys_user.realname AS personName,
+			maintain.cost,
+			maintain.addr,
+			maintain.store,
+			maintain.`status`,
+			maintain.crtid,
+			maintain.crttm,
+			maintain.updid,
+			maintain.updtm
+		FROM
+			maintain
+		LEFT JOIN sys_user ON sys_user.id = maintain.person
+		INNER JOIN car ON car.id = maintain.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(maintain.mtm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(maintain.mtm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+			
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) FROM
+			maintain
+		LEFT JOIN sys_user ON sys_user.id = maintain.person
+		INNER JOIN car ON car.id = maintain.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(maintain.mtm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(maintain.mtm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+			
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.MaintainEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into maintain
+		(
+			`cno`, 
+			`mtm`,
+			`ntm`, 
+			`mile`, 
+			`person`, 
+			`cost`, 
+			`addr`, 
+			`store`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{cno}, 
+			#{mtm}, 
+			#{ntm}, 
+			#{mile}, 
+			#{person}, 
+			#{cost}, 
+			#{addr}, 
+			#{store}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.MaintainEntity">
+		update maintain 
+		<set>
+			<if test="cno != null">`cno` = #{cno}, </if>
+			<if test="mtm != null">`mtm` = #{mtm}, </if>
+			<if test="ntm != null">`ntm` = #{ntm}, </if>
+			<if test="mile != null">`mile` = #{mile}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="cost != null">`cost` = #{cost}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="store != null">`store` = #{store}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from maintain where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from maintain where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

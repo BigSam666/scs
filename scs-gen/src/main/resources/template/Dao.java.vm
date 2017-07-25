@@ -1,0 +1,17 @@
+package ${package}.dao;
+
+import ${package}.entity.${className}Entity;
+
+//*****************************************************************************
+/**
+ * <p>Title:${className}Dao</p>
+ * <p>Description: ${comments}</p>
+ * <p>Copyright: ${copyright}</p>
+ * <p>Company: ${company} </p>
+ * @author ${author}
+ * @version ${version}
+ */
+//*****************************************************************************
+public interface ${className}Dao extends BaseDao<${className}Entity> {
+	
+}

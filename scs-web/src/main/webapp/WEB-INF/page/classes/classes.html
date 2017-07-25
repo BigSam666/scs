@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>班次管理</title> #parse("sys/header.html")
+</head>
+<body>
+	<div id="rrapp" v-cloak>
+		<div v-show="showList">
+			<div class="grid-btn">
+				<fieldset>
+					<legend>
+						<i class="fa fa-search"></i>&nbsp;查询条件
+					</legend>
+					<div class="form-group col-sm-2">
+						<div class="col-sm-8">
+							<input  type="text" class="form-control" v-model="q.name"
+								@keyup.enter="query" placeholder="所属项目部/创建人">
+						</div>
+						<div class="col-sm-2">
+							<a class="btn btn-info" @click="query">查询</a>
+						</div>
+					</div>
+					<script type="text/javascript">
+						var update = false;
+						var del = false;
+					</script>
+					#if($shiro.hasPermission("classes:update"))
+					<script type="text/javascript">
+						update = true;
+					</script>
+					#end #if($shiro.hasPermission("classes:delete"))
+					<script type="text/javascript">
+						del = true;
+					</script>
+					#end
+				</fieldset>
+				#if($shiro.hasPermission("classes:save")) <a class="btn btn-primary"
+					@click="add"><i class="fa fa-plus"></i>&nbsp;新增</a> #end
+				<script type="text/javascript">
+					var update = false;
+					var del = false;
+				</script>
+				#if($shiro.hasPermission("classes:update"))
+				<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+				<script type="text/javascript">
+					update = true;
+				</script>
+				#end #if($shiro.hasPermission("classes:delete"))
+				<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+				<script type="text/javascript">
+					del = true;
+				</script>
+				#end
+			</div>
+			<table id="jqGrid"></table>
+			<div id="jqGridPager"></div>
+		</div>
+
+		<div v-show="!showList" class="panel panel-default">
+			<div class="panel-heading">{{title}}</div>
+			<form class="form-horizontal">
+				<div class="form-group">
+					<div class="col-sm-2 control-label">所属项目部</div>
+					<div class="col-sm-10">
+						<input id="project" class="easyui-combobox" name="project">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">业务板块</div>
+					<div class="col-sm-10">
+						<input id="serviceType" class="easyui-combobox" name="busseg">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">班次名称</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="classes.classes"
+							name="classes" placeholder="班次名称" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">开始时间</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="starttime"
+							v-model="classes.starttime" id="starttime" placeholder="开始时间"
+							onClick="WdatePicker({dateFmt : 'HH:mm:ss'})" readonly=true />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">结束时间</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="emdtime"
+							v-model="classes.emdtime" id="emdtime" placeholder="结束时间"
+							onClick="WdatePicker({dateFmt : 'HH:mm:ss'})" readonly=true />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">备注</div>
+					<div class="col-sm-10">
+						<textarea class="textarea contentArea form-control" rows="5"
+							v-model="classes.remark" placeholder="备注"
+							v-model="smstemplate.content" name="remark"></textarea>
+					</div>
+				</div>
+				#if($shiro.hasPermission("classes:update") || $shiro.hasPermission("classes:save"))
+				<div class="form-group">
+					<div class="col-sm-2 control-label"></div>
+					<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定" /> &nbsp;&nbsp;
+					<input type="button" class="btn btn-warning" @click="reload" value="返回" />
+				</div>
+				#end
+			</form>
+		</div>
+	</div>
+
+	<script
+		src="${rc.contextPath}/js/classes/classes.js?_${date.systemTime}"></script>
+</body>
+</html>

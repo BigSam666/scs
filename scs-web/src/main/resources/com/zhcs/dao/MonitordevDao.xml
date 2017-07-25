@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.MonitordevDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.MonitordevEntity">
+		select
+			id, 		
+			devfrim, 		
+			devmodel, 		
+			devid, 		
+			addr, 		
+			lat, 		
+			lng, 		
+			pic, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from monitordev where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.MonitordevEntity">
+		select
+			m.id, 		
+			m.devfrim, 	
+			(select bc.cnm from base_code bc where bc.id=m.devfrim) AS devfrimName,	
+			m.devmodel, 
+			(select bc.cnm from base_code bc where bc.id=m.devmodel) AS devmodelName,		
+			m.devid, 		
+			m.addr, 		
+			m.lat, 		
+			m.lng, 		
+			m.pic, 		
+			m.crtid, 		
+			m.crttm, 		
+			m.updid, 
+			(select s.name from sys_user s where s.id=m.updid) AS updName,		
+			m.updtm		
+		from monitordev m
+		<where>
+			<if test="qdevid != null">
+				m.devid = #{qdevid}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by m.${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by m.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from monitordev 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.MonitordevEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into monitordev
+		(
+			`devfrim`, 
+			`devmodel`, 
+			`devid`, 
+			`addr`, 
+			`lat`, 
+			`lng`, 
+			`pic`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{devfrim}, 
+			#{devmodel}, 
+			#{devid}, 
+			#{addr}, 
+			#{lat}, 
+			#{lng}, 
+			#{pic}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.MonitordevEntity">
+		update monitordev 
+		<set>
+			<if test="devfrim != null">`devfrim` = #{devfrim}, </if>
+			<if test="devmodel != null">`devmodel` = #{devmodel}, </if>
+			<if test="devid != null">`devid` = #{devid}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="pic != null">`pic` = #{pic}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from monitordev where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from monitordev where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

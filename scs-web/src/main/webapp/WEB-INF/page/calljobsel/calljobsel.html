@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>工单查询</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("calljobsel:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("calljobsel:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("calljobsel:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">来源</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.source" name="source" placeholder="来源"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">姓名</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.name" name="name" placeholder="姓名"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">类型</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.type" name="type" placeholder="类型"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">电话号码</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.phone" name="phone" placeholder="电话号码"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">最近的地点</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.adds" name="adds" placeholder="最近的地点"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">内容</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.content" name="content" placeholder="内容"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">时间</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.date" name="date" placeholder="时间"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">图片</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="callJobsel.img" name="img" placeholder="图片"/>
+    </div>
+       	</div>
+   		#if($shiro.hasPermission("calljobsel:update") || $shiro.hasPermission("calljobsel:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/calljobsel/calljobsel.js?_${date.systemTime}"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>外呼管理</title> #parse("sys/header.html")
+</head>
+<style>
+.setgridwidth {
+	width: 70%;
+	float: right;
+}
+
+.setcallwidth {
+	width: 30%;
+	float: left;
+}
+
+.container {
+	width: 100%;
+}
+
+.container>.input-wrap {
+	height: 40px;
+	border: 1px solid #ccc;
+	margin-left: -1px;
+	border-bottom: 0px;
+	padding-right: 40px;
+	line-height: 40px;
+	position: relative;
+}
+
+.container>.input-wrap>.input {
+	height: inherit;
+	text-indent: 1em;
+	overflow: hidden;
+}
+
+.container>.input-wrap>a {
+	position: absolute;
+	width: 30px;
+	height: 20px;
+	right: 5px;
+	top: 10px;
+}
+
+.container>.caculate {
+	width: 100%;
+}
+
+.caculate>.row {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	height: 90px;
+	line-height: 90px;
+	padding: 0;
+}
+
+.caculate>.row>a {
+	display: inline-block;
+	-moz-box-flex: 1;
+	-webkit-box-flex: 1;
+	-webkit-flex: 1;
+	flex: 1;
+	border: 1px solid #d0d0d0;
+	margin-left: -1px;
+	margin-bottom: -1px;
+	text-align: center;
+	color: #333;
+	text-decoration: none;
+	background-image: -moz-linear-gradient(#fff, #e8e8e8);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e8e8e8),
+		to(#fff));
+	background-image: -webkit-linear-gradient(#fff, #e8e8e8);
+	background-image: -o-linear-gradient(#fff, #e8e8e8);
+	text-shadow: 1px 1px 1px #fff;
+}
+
+.caculate>.row>a.active {
+	background-image: -moz-linear-gradient(#ededed, #e1e1e1);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e1e1e1),
+		to(#ededed));
+	background-image: -webkit-linear-gradient(#ededed, #e1e1e1);
+	background-image: -o-linear-gradient(#ededed, #e1e1e1);
+}
+
+.container>.call-wrap {
+	height: 68px;
+	border: 1px solid #ccc;
+	margin-top: -1px;
+}
+
+.container>.call-wrap>a {
+	display: block;
+	width: 84px;
+	height: 35px;
+	margin: 0 auto;
+	margin-top: 16.5px;
+	background-color: #01cf99;
+	border-radius: 35px;
+}
+
+i.fa.fa-phone {
+	position: absolute;
+	top: 40%;
+	left: 48%;
+}
+
+.call-wrap {
+	position: relative;
+}
+
+i.fa.fa-arrow-left {
+	position: absolute;
+	top: 15%;
+	right: 5%;
+	color: #666;
+}
+</style>
+<body>
+	<div id="rrapp" v-cloak>
+		<div v-show="showList">
+			<div class="grid-btn">
+				<fieldset>
+					<legend>
+						<i class="fa fa-search"></i>&nbsp;查询条件
+					</legend>
+					<div class="grid-btn">
+						<div class="form-group col-sm-2">
+							<input type="text" class="form-control" v-model="q.query"
+								@keyup.enter="query" placeholder="请输入手机号码/姓名">
+						</div>
+						<a class="btn btn-info" @click="query">查询</a>
+					</div>
+				</fieldset>
+				<script type="text/javascript">
+					var update = false;
+					var del = false;
+				</script>
+			</div>
+			<div class="setcallwidth">
+				<div class="container">
+					<div class="input-wrap">
+						<div class="input"></div>
+						<i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> <a
+							href="javascript:void(0)" id="cacu-del"></a>
+					</div>
+					<div class="caculate">
+						<div class="row">
+							<a href="javascript:void(0)" data-val="1">1</a> <a
+								href="javascript:void(0)" data-val="2">2</a> <a
+								href="javascript:void(0)" data-val="3">3</a>
+						</div>
+						<div class="row">
+							<a href="javascript:void(0)" data-val="4">4</a> <a
+								href="javascript:void(0)" data-val="5">5</a> <a
+								href="javascript:void(0)" data-val="6">6</a>
+						</div>
+						<div class="row">
+							<a href="javascript:void(0)" data-val="7">7</a> <a
+								href="javascript:void(0)" data-val="8">8</a> <a
+								href="javascript:void(0)" data-val="9">9</a>
+						</div>
+						<div class="row">
+							<a href="javascript:void(0)" data-val="*">*</a> <a
+								href="javascript:void(0)" data-val="0">0</a> <a
+								href="javascript:void(0)" data-val="#">#</a>
+						</div>
+					</div>
+					<div class="call-wrap">
+						<i class="fa fa-phone" aria-hidden="true"></i> <a
+							href="javascript:void(0)" id="call"></a>
+					</div>
+				</div>
+			</div>
+			<div class="setgridwidth">
+				<table id="jqGrid"></table>
+				<div id="jqGridPager"></div>
+			</div>
+		</div>
+	</div>
+
+	<script
+		src="${rc.contextPath}/js/calltel/calltel.js?_${date.systemTime}"></script>
+</body>
+</html>

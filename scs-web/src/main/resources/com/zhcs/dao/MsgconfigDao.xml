@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.MsgconfigDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.MsgconfigEntity">
+		select
+			id, 		
+			dup, 		
+			pup, 		
+			type, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from msgconfig where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.MsgconfigEntity">
+		select
+			id, 		
+			dup, 		
+			pup, 		
+			type, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from msgconfig 
+		order by id
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from msgconfig 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.MsgconfigEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into msgconfig
+		(
+			`dup`, 
+			`pup`, 
+			`type`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{dup}, 
+			#{pup}, 
+			#{type}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.MsgconfigEntity">
+		update msgconfig 
+		<set>
+			<if test="dup != null">`dup` = #{dup}, </if>
+			<if test="pup != null">`pup` = #{pup}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from msgconfig where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from msgconfig where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

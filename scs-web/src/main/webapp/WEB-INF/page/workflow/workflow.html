@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>工作流</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("workflow:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("workflow:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("workflow:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">节点名称</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.nodename" name="nodename" placeholder="节点名称"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">流程名称</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.nm" name="nm" placeholder="流程名称"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">上一节点编号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.prevno" name="prevno" placeholder="上一节点编号"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">下一节点编号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.nextno" name="nextno" placeholder="下一节点编号"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">回退节点编号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.returnno" name="returnno" placeholder="回退节点编号"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">角色集合</div>
+	    <div class="col-sm-10">
+	       <input type="hidden" v-model="workflow.roleids" />
+	       <input type="text" class="form-control" style="cursor:pointer;" v-model="workflow.roleTList" @click="roleTree" readonly="readonly" placeholder="company"/>
+	   	</div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">节点类型</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.nodetype" name="nodetype" placeholder="节点类型"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">版本序号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.vseq" name="vseq" placeholder="版本序号"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">版本名称</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="workflow.vname" name="vname" placeholder="版本名称"/>
+    </div>
+       	</div>
+ 		#if($shiro.hasPermission("workflow:update") || $shiro.hasPermission("workflow:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+<!-- 选择角色 -->
+<div id="deptLayer" style="display: none;padding:10px;">
+	<ul id="deptTree" class="ztree"></ul>
+</div>
+<script src="${rc.contextPath}/js/workflow/workflow.js?_${date.systemTime}"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CostrecordDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CostrecordEntity">
+		select
+			id, 		
+			ddate, 		
+			dtype, 		
+			money, 		
+			person, 		
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from costrecord where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CostrecordEntity">
+		select
+			id, 		
+			ddate, 		
+			dtype, 		
+			money, 		
+			person, 		
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from costrecord
+		<where>
+			<if test="userid != null">
+				crtid = #{userid}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryListMap" resultType="java.util.Map">
+		select
+			id, 		
+			ddate, 		
+			dtype, 		
+			money, 		
+			person, 		
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from costrecord 
+		<where>
+			<if test="qdtype != null">
+				dtype = #{qdtype}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from costrecord
+		<where>
+			<if test="userid != null">
+				crtid = #{userid}
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CostrecordEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into costrecord
+		(
+			`ddate`, 
+			`dtype`, 
+			`money`, 
+			`person`, 
+			`rmk`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{ddate}, 
+			#{dtype}, 
+			#{money}, 
+			#{person}, 
+			#{rmk}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CostrecordEntity">
+		update costrecord 
+		<set>
+			<if test="ddate != null">`ddate` = #{ddate}, </if>
+			<if test="dtype != null">`dtype` = #{dtype}, </if>
+			<if test="money != null">`money` = #{money}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="rmk != null">`rmk` = #{rmk}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from costrecord where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from costrecord where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

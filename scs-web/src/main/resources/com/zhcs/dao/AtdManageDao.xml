@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.AtdManageDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.AtdManageEntity">
+		select
+			id, 		
+			person, 
+			atdtype, 		
+			ltype, 		
+			ftime, 		
+			stime, 		
+			ttime, 		
+			fotime, 		
+			duration, 		
+			rmk, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from atd_manage where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.AtdManageEntity">
+		select
+			am.id, 		
+			am.person, 
+			(select su.realname from sys_user su where su.id = am.person) AS personName,
+			(select group_concat(sd.name) from sys_user_dept sud,sys_department sd where sud.deptid = sd.id and sud.userid = am.person ) AS deptName,		
+			am.atdtype, 	
+			am.ltype, 		
+			am.ftime, 		
+			am.stime, 		
+			am.ttime, 		
+			am.fotime, 		
+			am.duration, 		
+			am.rmk, 		
+			am.status, 		
+			am.crtid, 		
+			am.crttm, 		
+			am.updid, 		
+			am.updtm		
+		from atd_manage am
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by am.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.AtdManageEntity">
+		select
+			DISTINCT am.id, 		
+			am.person, 
+			sys_user.realname AS personName,
+			(select group_concat(sd.`name`) from sys_user_dept sud,sys_department sd where sud.deptid = sd.id and sud.userid = am.person ) AS deptName,		
+			am.atdtype, 	
+			am.ltype, 		
+			am.ftime, 		
+			am.stime, 		
+			am.ttime, 		
+			am.fotime, 		
+			am.duration, 		
+			am.rmk, 		
+			am.`status`, 		
+			am.crtid, 		
+			am.crttm, 		
+			am.updid, 		
+			am.updtm		
+		from atd_manage am
+		INNER JOIN sys_user ON sys_user.id = am.person
+		INNER JOIN sys_user_dept ON sys_user_dept.userid = am.person
+		<where>
+			<if test="ids != null and ids != ''">
+				and FIND_IN_SET(sys_user_dept.deptid,#{ids})
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by am.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListIncludeTime" resultType="com.zhcs.entity.AtdManageEntity">
+		select
+			am.id, 		
+			am.person, 	
+			am.atdtype, 	
+			am.ltype, 		
+			am.ftime, 		
+			am.stime, 		
+			am.ttime, 		
+			am.fotime, 		
+			am.duration, 		
+			am.rmk, 		
+			am.status, 		
+			am.crtid, 		
+			am.crttm, 		
+			am.updid, 		
+			am.updtm		
+		from atd_manage am
+		<where>
+			<if test="#{1} != null">
+		         am.ftime &lt; #{1} and am.stime &gt; #{1}
+		    </if> 
+			<if test="#{0} != null">
+		         and am.person = #{0}
+		    </if> 
+		</where>
+	</select>
+	
+	<select id="queryTxListIncludeDuration" resultType="com.zhcs.entity.AtdManageEntity">
+		select
+			am.id, 		
+			am.person, 	
+			am.atdtype, 	
+			am.ltype, 		
+			am.ftime, 		
+			am.stime, 		
+			am.ttime, 		
+			am.fotime, 		
+			am.duration, 		
+			am.rmk, 		
+			am.status, 		
+			am.crtid, 		
+			am.crttm, 		
+			am.updid, 		
+			am.updtm		
+		from atd_manage am
+		where 
+			am.person = #{0}
+			and am.atdtype = 4
+			and ((am.ttime &lt; #{3} and am.fotime &gt; #{3}) or (am.ttime &lt; #{4} and am.fotime &gt; #{4}))
+			and am.status = 1
+	</select>
+	
+	<select id="queryTbListIncludeDuration" resultType="com.zhcs.entity.AtdManageEntity">
+		select
+			am.id, 		
+			am.person, 	
+			am.atdtype, 	
+			am.ltype, 		
+			am.ftime, 		
+			am.stime, 		
+			am.ttime, 		
+			am.fotime, 		
+			am.duration, 		
+			am.rmk, 		
+			am.status, 		
+			am.crtid, 		
+			am.crttm, 		
+			am.updid, 		
+			am.updtm		
+		from atd_manage am
+		where 
+			am.person = #{0}
+			and am.atdtype = 3
+			and ((am.ttime &lt; #{3} and am.fotime &gt; #{3}) or (am.ttime &lt; #{4} and am.fotime &gt; #{4}))
+			and am.status = 1
+	</select>
+
+
+	
+<!--  	<select id="queryTotal" resultType="int"> -->
+<!-- 		select count(*) from atd_manage  -->
+<!-- 	</select> -->
+	
+	<select id="queryTotal" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			(
+				SELECT DISTINCT
+					am.id
+				FROM
+					atd_manage am
+				INNER JOIN sys_user ON sys_user.id = am.person
+				INNER JOIN sys_user_dept ON sys_user_dept.userid = am.person
+				<where>
+					<if test="ids != null and ids != ''">
+						and FIND_IN_SET(sys_user_dept.deptid,#{ids})
+					</if>
+				</where>
+			) atdManage
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.AtdManageEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into atd_manage
+		(
+			`person`, 
+			`atdtype`, 
+			`ltype`, 
+			`ftime`, 
+			`stime`, 
+			`ttime`, 
+			`fotime`, 
+			`duration`, 
+			`status`, 
+			`rmk`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{person}, 
+			#{atdtype}, 
+			#{ltype}, 
+			#{ftime}, 
+			#{stime}, 
+			#{ttime}, 
+			#{fotime}, 
+			#{duration}, 
+			#{status}, 
+			#{rmk}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.AtdManageEntity">
+		update atd_manage 
+		<set>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="atdtype != null">`atdtype` = #{atdtype}, </if>
+			<if test="ltype != null">`ltype` = #{ltype}, </if>
+			<if test="ftime != null">`ftime` = #{ftime}, </if>
+			<if test="stime != null">`stime` = #{stime}, </if>
+			<if test="ttime != null">`ttime` = #{ttime}, </if>
+			<if test="fotime != null">`fotime` = #{fotime}, </if>
+			<if test="duration != null">`duration` = #{duration}, </if>
+			<if test="rmk != null">`rmk` = #{rmk}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from atd_manage where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from atd_manage where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<!-- 查询调班 调休的信息 -->
+	<select id="findTiaoxiuOrxiu" resultType="java.util.Map" parameterType="java.util.Map">
+		select
+			am.id, 		
+			am.person, 	
+			am.atdtype, 	
+			am.ltype, 		
+			am.ftime, 		
+			am.stime, 		
+			am.ttime, 		
+			am.fotime, 		
+			am.duration, 		
+			am.rmk, 		
+			am.status, 		
+			am.crtid, 		
+			am.crttm, 		
+			am.updid, 		
+			am.updtm		
+		from atd_manage am
+		where 1=1  and am.atdtype in (3,4) and am.status = 1
+		<if test="person != null and person !=''">
+			and am.person = #{person}
+		</if>
+		<if test="ftime != null and ftime !=''">
+			and am.ftime = #{ftime}
+		</if>
+		<if test="stime != null and stime !=''">
+			and am.stime = #{stime}
+		</if>
+			
+	</select>
+		
+		
+</mapper>

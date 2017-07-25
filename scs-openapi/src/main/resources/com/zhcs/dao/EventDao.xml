@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.EventDao">
+
+	<select id="queryObjectById" resultType="com.zhcs.entity.EventEntity">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event where id = #{value}
+	</select>
+	
+	<select id="queryListBetweenTime" resultType="com.zhcs.entity.EventEntity">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event 
+		<where>
+			<if test="userId != null">
+				and handle = #{userId}
+			</if>
+			<if test="btime != null">
+				and dltm &gt; #{btime}
+			</if>
+			<if test="etime != null">
+				and dltm &lt; #{etime}
+			</if>
+		</where>
+		order by dltm desc
+	</select>
+	
+	<select id="getHandleList" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			current currentType, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event_log 
+		where updid = #{uid}
+	</select>
+
+	<select id="queryPendingEvents" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			current currentType, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event 
+		where handle=#{userId} and current in 
+		<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+			#{cc}
+		</foreach>
+		order by dltm desc
+		<if test="offset != null and pagesize != null">
+			limit #{offset}, #{pagesize}
+		</if>
+	</select>
+
+	<select id="queryNeedDispEvents" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			current currentType, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event 
+		where current in 
+		<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+			#{cc}
+		</foreach>
+		order by updtm desc
+		<if test="offset != null and pagesize != null">
+			limit #{offset}, #{pagesize}
+		</if>
+	</select>
+
+	<select id="getCount" resultType="java.lang.Integer">
+		select count(*)		
+		from event 
+		<where>
+			<if test="userId != null">
+				handle=#{userId}
+			</if>
+			<if test="ccs != null">
+				and current in 
+				<foreach item="cc" collection="ccs" open="(" separator="," close=")">
+					#{cc}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<select id="queryObject" resultType="java.util.Map">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event where id = #{value}
+	</select>
+	
+	<insert id="save" parameterType="com.zhcs.entity.EventEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into event
+		(
+			`busseg`, 
+			`no`, 
+			`sour`, 
+			`qdescribe`, 
+			`lng`, 
+			`lat`, 
+			`addr`, 
+			`qimg`, 
+			`handle`, 
+			`htm`, 
+			`img`, 
+			`estimatetm`, 
+			`auxiliary`,
+			`des`, 
+			`dltm`, 
+			`current`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{busseg}, 
+			#{no}, 
+			#{sour}, 
+			#{qdescribe}, 
+			#{lng}, 
+			#{lat}, 
+			#{addr}, 
+			#{qimg}, 
+			#{handle}, 
+			#{htm}, 
+			#{img}, 
+			#{estimatetm}, 
+			#{auxiliary}, 
+			#{des}, 
+			#{dltm}, 
+			#{current}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.zhcs.entity.EventEntity">
+		update event 
+		<set>
+			<if test="busseg != null">`busseg` = #{busseg}, </if>
+			<if test="no != null">`no` = #{no}, </if>
+			<if test="sour != null">`sour` = #{sour}, </if>
+			<if test="qdescribe != null">`qdescribe` = #{qdescribe}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="qimg != null">`qimg` = #{qimg}, </if>
+			<if test="handle != null">`handle` = #{handle}, </if>
+			<if test="htm != null">`htm` = #{htm}, </if>
+			<if test="img != null">`img` = #{img}, </if>
+			<if test="estimatetm != null">`estimatetm` = #{estimatetm}, </if>
+			<if test="auxiliary != null">`auxiliary` = #{auxiliary}, </if>
+			<if test="des != null">`des` = #{des}, </if>
+			<if test="dltm != null">`dltm` = #{dltm}, </if>
+			<if test="current != null">`current` = #{current}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from event where id = #{value}
+	</delete>
+
+</mapper>

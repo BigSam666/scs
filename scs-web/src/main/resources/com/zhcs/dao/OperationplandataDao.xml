@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.OperationplandataDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.OperationplandataEntity">
+		select
+			id, 		
+			oid, 		
+			optime, 		
+			shift, 		
+			cla, 		
+			member, 		
+			driver, 		
+			car, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from operationplandata where id = #{value}
+	</select>
+
+
+	<select id="queryDay" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM operationplandata
+		WHERE optime = #{date}
+		AND shift in
+		<foreach item="item" collection="banci" open="(" separator="," close=")">
+			#{item}
+		</foreach>;
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.OperationplandataEntity">
+		select
+			id,
+			oid,
+			DATE_FORMAT(optime,'%Y-%m-%d') optime,
+			shift,
+			cla,
+			member,
+			driver,
+			car,
+			status,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from operationplandata
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by updtm desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryList2" resultType="java.util.Map">
+		SELECT
+		op.id,
+		op.oid,
+		DATE_FORMAT(op.optime, '%Y-%m-%d') optime,
+		op.shift,
+		(SELECT CONCAT(c.classes, " / ", c.starttime, " - ", c.emdtime) FROM classes c WHERE c.id = op.shift) shiftText,
+		op.cla,
+		(SELECT sd.name FROM sys_department sd WHERE sd.id = op.cla) claText,
+		op.member,
+		(SELECT su.realname FROM sys_user su WHERE su.id = op.member) memberText,
+		op.driver,
+		op.car,
+		op.STATUS,
+		op.crtid,
+		op.crttm,
+		op.updid,
+		op.updtm
+		FROM
+		operationplandata op
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by op.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by op.updtm desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from operationplandata 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.OperationplandataEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into operationplandata
+		(
+			`oid`, 
+			`optime`, 
+			`shift`, 
+			`cla`, 
+			`member`, 
+			`driver`, 
+			`car`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{oid}, 
+			#{optime}, 
+			#{shift}, 
+			#{cla}, 
+			#{member}, 
+			#{driver}, 
+			#{car}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.OperationplandataEntity">
+		update operationplandata 
+		<set>
+			<if test="oid != null">`oid` = #{oid}, </if>
+			<if test="optime != null">`optime` = #{optime}, </if>
+			<if test="shift != null">`shift` = #{shift}, </if>
+			<if test="cla != null">`cla` = #{cla}, </if>
+			<if test="member != null">`member` = #{member}, </if>
+			<if test="driver != null">`driver` = #{driver}, </if>
+			<if test="car != null">`car` = #{car}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from operationplandata where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from operationplandata where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.InsureDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.InsureEntity">
+		select
+			id, 		
+			cno,
+			insno, 		
+			insuretm, 		
+			ninstm, 		
+			person, 		
+			cost, 		
+			addr, 		
+			unit, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from insure where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.InsureEntity">
+		select
+			i.id, 		
+			i.cno, 
+			(select c.cno from car c where c.id=i.cno) AS cnoText,		
+			i.insno,	
+			i.insuretm, 		
+			i.ninstm, 		
+			i.person, 
+			(select s.name from sys_user s where s.id=i.person) AS personName,		
+			i.cost, 		
+			i.addr, 		
+			i.unit, 		
+			i.status, 		
+			i.crtid, 		
+			i.crttm, 		
+			i.updid, 		
+			i.updtm		
+		from insure i
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by i.${sidx} i.${order} 
+			</when>
+			<otherwise>
+				order by i.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.InsureEntity">
+		select
+			insure.id, 		
+			insure.cno, 
+			car.cno AS cnoText,		
+			insure.insno,	
+			insure.insuretm, 		
+			insure.ninstm, 		
+			insure.person,
+			sys_user.realname AS personName,
+			insure.cost, 		
+			insure.addr, 		
+			insure.unit, 		
+			insure.status, 		
+			insure.crtid, 		
+			insure.crttm, 		
+			insure.updid, 		
+			insure.updtm		
+		from insure
+		LEFT JOIN sys_user ON sys_user.id = insure.person
+		INNER JOIN car ON car.id = insure.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(insure.insuretm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(insure.insuretm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+			
+			
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from insure
+		LEFT JOIN sys_user ON sys_user.id = insure.person
+		INNER JOIN car ON car.id = insure.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(insure.insuretm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(insure.insuretm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+			
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.InsureEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into insure
+		(
+			`cno`, 
+			`insno`,
+			`insuretm`, 
+			`ninstm`, 
+			`person`, 
+			`cost`, 
+			`addr`, 
+			`unit`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{cno}, 
+			#{insno},
+			#{insuretm}, 
+			#{ninstm}, 
+			#{person}, 
+			#{cost}, 
+			#{addr}, 
+			#{unit}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.InsureEntity">
+		update insure 
+		<set>
+			<if test="cno != null">`cno` = #{cno}, </if>
+			<if test="insno != null">`insno` = #{insno}, </if>
+			<if test="insuretm != null">`insuretm` = #{insuretm}, </if>
+			<if test="ninstm != null">`ninstm` = #{ninstm}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="cost != null">`cost` = #{cost}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="unit != null">`unit` = #{unit}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from insure where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from insure where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

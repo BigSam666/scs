@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.SysMenuDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.SysMenuEntity">
+		select
+			id,
+			pid,
+			name,
+			url,
+			perms,
+			type,
+			icon,
+			sort,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from sys_menu where id = #{value}
+	</select>
+	
+	<insert id="save" parameterType="com.zhcs.entity.SysMenuEntity">
+		insert into sys_menu
+		(
+			`id`, 
+			`pid`, 
+			`name`, 
+			`url`, 
+			`perms`, 
+			`type`, 
+			`icon`, 
+			`sort`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{id}, 
+			#{pid}, 
+			#{name}, 
+			#{url}, 
+			#{perms}, 
+			#{type}, 
+			#{icon}, 
+			#{sort}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	
+	<select id="queryListParentId" resultType="com.zhcs.entity.SysMenuEntity">
+		select
+			id,
+			pid,
+			name,
+			url,
+			perms,
+			type,
+			icon,
+			sort,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from sys_menu where pid = #{pid} order by sort asc 
+	</select>
+	
+	<select id="queryNotButtonList" resultType="com.zhcs.entity.SysMenuEntity">
+		select
+			id,
+			pid,
+			name,
+			url,
+			perms,
+			type,
+			icon,
+			sort,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		from sys_menu where type != 2 order by sort asc 
+	</select>
+	
+	<select id="queryList" resultType="com.zhcs.entity.SysMenuEntity">
+		select 
+			m.id,
+			m.pid,
+			(select p.name from sys_menu p where p.id = m.pid) as parentName,
+			m.name,
+			m.url,
+			m.perms,
+			m.type,
+			m.icon,
+			m.sort,
+			m.crtid,
+			m.crttm,
+			m.updid,
+			m.updtm 
+		from sys_menu m 
+		<where>
+			<if test="name != null and name.trim() != ''">
+				and m.`name` like concat('%',#{name},'%') 
+			</if>
+			<if test="pid != null and pid.trim() != ''">
+				and m.`pid` = #{pid} 
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by m.${sidx} ${order}
+			</when>
+			<otherwise>
+				order by m.sort asc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(*) from sys_menu
+		<where>
+			<if test="name != null and name.trim() != ''">
+				and `name` like concat('%',#{name},'%') 
+			</if>
+			<if test="pid != null and pid.trim() != ''">
+				and `pid` = #{pid} 
+			</if>
+		</where>
+	</select>
+	 
+	<update id="update" parameterType="com.zhcs.entity.SysMenuEntity">
+		update sys_menu 
+		<set> 
+			<if test="pid != null">`pid` = #{pid}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="url != null">`url` = #{url}, </if>
+			<if test="perms != null">`perms` = #{perms}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="sort != null">`sort` = #{sort},</if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="deleteBatch">
+		delete from sys_menu where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		;
+		delete from sys_role_menu where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+</mapper>

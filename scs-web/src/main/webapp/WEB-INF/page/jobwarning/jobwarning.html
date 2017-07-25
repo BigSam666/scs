@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>jobwarning工作预警</title>
+    #parse("sys/header.html")
+</head>
+<style>
+    .form-horizontal {
+        width: 700px;
+    }
+</style>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            #if($shiro.hasPermission("jobwarning:save"))
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            #end
+            <script type="text/javascript">
+                var update = false;
+                var del = false;
+            </script>
+            #if($shiro.hasPermission("jobwarning:update"))
+            <!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+            <script type="text/javascript">
+                update = true;
+            </script>
+            #end
+            #if($shiro.hasPermission("jobwarning:delete"))
+            <!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+            <script type="text/javascript">
+                del = true;
+            </script>
+            #end
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">选择项目部</div>
+                <div class="col-sm-10">
+                    <input id="project" class="easyui-combobox" name="project"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">选择业务板块</div>
+                <div class="col-sm-10">
+                    <input id="serviceType" class="easyui-combobox" name="serviceType"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">选择业务类型</div>
+                <div class="col-sm-10">
+                    <input id="businesstype" class="easyui-combobox" name="businesstype"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">选择预警类型</div>
+                <div class="col-sm-10">
+                    <input id="ewtype" class="easyui-combobox" name="ewtype"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">是否推送本人</div>
+                <div class="col-sm-10">
+                    <input id="flag" class="easyui-combobox" name="flag"/>
+                </div>
+            </div>
+            <template>
+                <div class="panel-heading ">
+                    <div class="form-group">
+                        <div class="col-xs-4">
+                            <div class="col-sm-6 control-label">时间设置</div>
+                            <div class="col-sm-6">
+                                <input type="text" name="name" placeholder="分钟" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <div class="col-sm-3 control-label">接收人</div>
+                            <div class="col-sm-9">
+                                <input type="text" name="name" placeholder="接收人" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="button" class="btn  btn-success">
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn  btn-danger">
+                                <i class="fa fa-minus" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            #if($shiro.hasPermission("jobwarning:update") || $shiro.hasPermission("jobwarning:save"))
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+            #end
+        </form>
+    </div>
+</div>
+
+<script src="${rc.contextPath}/js/jobwarning/jobwarning.js?_${date.systemTime}"></script>
+</body>
+</html>

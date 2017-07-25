@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.CarDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.CarEntity">
+		select
+			id, 		
+			fleett, 		
+			ctype, 		
+			cno, 
+			pic,		
+			cin, 		
+			engno, 		
+			binddev, 
+			binddevrfid,		
+			person, 		
+			phone, 		
+			rmk, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from car where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.CarEntity">
+		select
+			c.id, 		
+			c.fleett, 
+			f.nm AS fleettName,		
+			c.ctype, 
+			ct.nm AS ctypeName,
+			c.cno,
+			c.pic, 		
+			c.cin, 		
+			c.engno, 		
+			c.binddev, 	
+			c.binddevrfid,	
+			c.person, 		
+			(select s.name from sys_user s where s.id=c.person) AS personName,		
+			c.phone, 
+			c.rmk, 		
+			c.status,
+			c.crtid, 		
+			c.crttm, 		
+			c.updid, 		
+			c.updtm		
+		from car c,fleett f,cartype ct
+		<where>
+			f.id=c.fleett and ct.id=c.ctype
+			<if test="condition !=null and condition.trim() != ''">
+				and	(f.nm like concat('%',#{condition},'%') or ct.nm like concat('%',#{condition},'%') or c.cno like concat('%',#{condition},'%'))
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by c.${sidx} c.${order} 
+			</when>
+			<otherwise>
+				order by c.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.CarEntity">
+		select
+			c.id, 		
+			c.fleett, 
+			f.nm AS fleettName,		
+			c.ctype, 
+			ct.nm AS ctypeName,
+			c.cno,
+			c.pic, 		
+			c.cin, 		
+			c.engno, 		
+			c.binddev, 	
+			c.binddevrfid,	
+			c.person, 		
+			(select s.name from sys_user s where s.id=c.person) AS personName,		
+			c.phone, 
+			c.rmk, 		
+			c.status,
+			c.crtid, 		
+			c.crttm, 		
+			c.updid, 		
+			c.updtm		
+		from car c,fleett f,cartype ct
+		<where>
+			f.id=c.fleett and ct.id=c.ctype
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(f.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 c.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="carType != null and carType !=''">
+				and c.ctype = #{carType}
+			</if>
+			
+			
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by c.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*)  from car c,fleett f,cartype ct
+		<where>
+			f.id=c.fleett and ct.id=c.ctype
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(f.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 c.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="carType != null and carType !=''">
+				and c.ctype = #{carType}
+			</if>
+			
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.CarEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into car
+		(
+			`fleett`, 
+			`ctype`, 
+			`cno`, 
+			`pic`,
+			`cin`, 
+			`engno`, 
+			`binddev`,
+			`binddevrfid`, 
+			`person`, 
+			`phone`, 
+			`rmk`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{fleett}, 
+			#{ctype}, 
+			#{cno},
+			#{pic}, 
+			#{cin}, 
+			#{engno}, 
+			#{binddev}, 
+			#{binddevrfid},
+			#{person}, 
+			#{phone}, 
+			#{rmk}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.CarEntity">
+		update car 
+		<set>
+			<if test="fleett != null">`fleett` = #{fleett}, </if>
+			<if test="ctype != null">`ctype` = #{ctype}, </if>
+			<if test="cno != null">`cno` = #{cno}, </if>
+			<if test="pic != null">`pic` = #{pic}, </if>
+			<if test="cin != null">`cin` = #{cin}, </if>
+			<if test="engno != null">`engno` = #{engno}, </if>
+			<if test="binddev != null">`binddev` = #{binddev}, </if>
+			<if test="binddevrfid != null">`binddevrfid` = #{binddevrfid}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="phone != null">`phone` = #{phone}, </if>
+			<if test="rmk != null">`rmk` = #{rmk}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from car where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from car where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

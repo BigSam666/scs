@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>违章管理</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+	<fieldset>
+				<legend>
+					<i class="fa fa-search"></i>&nbsp;查询条件
+				</legend>
+
+				<div class="col-sm-3">
+					<!-- <label class="col-sm-4 control-label">下单结束时间：</label> -->
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="q.condition"
+							@keyup.enter="query" placeholder="请输入车牌号">
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<label class="myLabel-content" style="margin-top: 8px;">日期范围：</label>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="starttime"
+							placeholder="开始日期" onClick="WdatePicker()" />
+					</div>
+					<div class="col-sm-4 control-label">
+						<input type="text" class="form-control" name="" id="endtime"
+							placeholder="结束日期" onClick="WdatePicker()" />
+					</div>
+				</div>
+
+
+				<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+				</div>
+
+			</fieldset>
+		<div class="grid-btn">
+			#if($shiro.hasPermission("illega:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("illega:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("illega:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">车牌号</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="illega.cno" name="cno" placeholder="车牌号"/> -->
+		<input id="cno" class="easyui-combobox" name="cno" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">违章日期</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="illega.illtm" name="illtm" placeholder="违章日期"/> -->
+		<input type="text" class="form-control" name="illtm" id="illtm" placeholder="违章日期" onClick="WdatePicker()" readonly=true/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">违章原因</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="illega.cause" name="cause" placeholder="违章原因"/> -->
+		<input id="cause" class="easyui-combobox" name="cause" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">违章人员</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="illega.person" name="person" placeholder="违章人员"/> -->
+		<input type="hidden" v-model="illega.person" name="person" />
+		<input type="text" class="form-control" style="cursor:pointer;" v-model="illega.personName" @click="personTree" readonly="readonly" placeholder="违章人员"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">处罚金额</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="illega.amount" name="amount" placeholder="处罚金额"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">扣分</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="illega.score" name="score" placeholder="扣分"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">处罚单位</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="illega.unit" name="unit" placeholder="处罚单位"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">违章地点</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="illega.addr" name="addr" placeholder="违章地点"/>
+    </div>
+       	</div>
+   				   	<div class="form-group" style="display: none;">
+   	<div class="col-sm-2 control-label">状态</div>
+   	   	<label class="radio-inline">
+	  <input type="radio" name="status" value="1" v-model="illega.status"/> 有效
+	</label>
+   	<label class="radio-inline">
+	  <input type="radio" name="status" value="0" v-model="illega.status"/> 无效
+	</label>
+       	</div>
+   																	#if($shiro.hasPermission("illega:update") || $shiro.hasPermission("illega:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+<!-- 违章人员 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+<script src="${rc.contextPath}/js/illega/illega.js?_${date.systemTime}"></script>
+</body>
+</html>

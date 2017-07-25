@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>司机管理</title>
+#parse("sys/header.html")
+</head>
+<body>
+	<div id="rrapp" v-cloak>
+		<div v-show="showList">
+		
+		<fieldset>
+			<legend><i class="fa fa-search"></i>&nbsp;查询条件</legend>
+			<div class="form-group col-sm-12">
+			   	<div class="col-sm-3">
+					<input type="text" class="form-control" v-model="q.condition" @keyup.enter="query" placeholder="请输入司机姓名">
+			    </div>
+			   	<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+			    </div>
+			</div>
+		</fieldset>
+		
+			<div class="grid-btn">
+				#if($shiro.hasPermission("driver:save")) 
+				<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a> 
+				#end
+				<script type="text/javascript">
+					var update = false;
+					var del = false;
+				</script>
+				#if($shiro.hasPermission("driver:update"))
+				<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+				<script type="text/javascript">
+					update=true;
+				</script>
+				#end
+				#if($shiro.hasPermission("driver:delete"))
+				<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+				<script type="text/javascript">
+					del=true;
+				</script>
+				#end
+			</div>
+			<table id="jqGrid"></table>
+			<div id="jqGridPager"></div>
+		</div>
+
+		<div v-show="!showList" class="panel panel-default">
+			<div class="panel-heading">{{title}}</div>
+			<form class="form-horizontal">
+				<div class="form-group">
+					<div class="col-sm-2 control-label">驾照编号</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="driver.dno" name="dno" placeholder="驾照编号" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">准驾车型</div>
+					<div class="col-sm-10">
+<!-- 						<input type="text" class="form-control" v-model="driver.dclass" name="dclass" placeholder="准驾车型" /> -->
+						<input id="dclass" class="easyui-combobox" name="dclass" style="width:100%;" readonly=true>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">领证日期</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="bdate" id="bdate" placeholder="领证日期" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" data-format="yyyy-MM-dd" readonly=true/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">到期日期</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="edate" id="edate" placeholder="到期日期" onClick="WdatePicker()" readonly=true/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">司机名</div>
+					<div class="col-sm-10">
+			      		<input type="hidden" v-model="driver.driverId" name="driverId" />
+		    			<input type="text" class="form-control" style="cursor:pointer;" v-model="driver.driverName" name="driverName" @click="driverTree" readonly="readonly" placeholder="司机名"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">身份证号</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="driver.card" name="card" placeholder="身份证号" readonly="readonly"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">手机号</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="driver.phone" name="phone" placeholder="手机号" readonly="readonly"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">邮箱</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="driver.email" name="email" placeholder="邮箱" readonly="readonly"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">所属部门</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="driver.dept" name="dept" placeholder="所属部门" readonly="readonly"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label">所属角色</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="driver.role" name="role" placeholder="所属角色" readonly="readonly"/>
+					</div>
+				</div>
+				<div class="form-group" style="display: none;">
+					<div class="col-sm-2 control-label">状态</div>
+					<label class="radio-inline"> 
+						<input type="radio" name="status" value="1" v-model="driver.status" /> 有效
+					</label> 
+					<label class="radio-inline"> 
+						<input type="radio" name="status" value="0" v-model="driver.status" /> 无效
+					</label>
+				</div>
+				#if($shiro.hasPermission("driver:update") || $shiro.hasPermission("driver:save"))
+				<div class="form-group">
+					<div class="col-sm-2 control-label"></div>
+					<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定" /> &nbsp;&nbsp;
+					<input type="button" class="btn btn-warning" @click="reload" value="返回" />
+				</div>
+				#end
+			</form>
+		</div>
+	</div>
+
+<!-- 选择部门 -->
+<div id="deptLayer" style="display: none;padding:10px;">
+	<ul id="deptTree" class="ztree"></ul>
+</div>
+<!-- 选择司机 -->
+<div id="driverLayer" style="display: none;padding:10px;">
+	<ul id="driverTree" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/driver/driver.js?_${date.systemTime}"></script>
+</body>
+</html>

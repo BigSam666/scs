@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.YeartrialDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.YeartrialEntity">
+		select
+			id, 		
+			cno, 		
+			yttm, 		
+			nyttm,
+			ytno, 		
+			person, 		
+			cost, 		
+			addr, 		
+			unit, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from yeartrial where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.YeartrialEntity">
+		select
+			y.id, 		
+			y.cno, 	
+			(select c.cno from car c where c.id=y.cno) AS cnoText,	
+			y.yttm, 		
+			y.nyttm,
+			y.ytno, 		
+			y.person, 		
+			(select s.name from sys_user s where s.id=y.person) AS personName,
+			y.cost, 		
+			y.addr, 		
+			y.unit, 		
+			y.status, 		
+			y.crtid, 		
+			y.crttm, 		
+			y.updid, 		
+			y.updtm		
+		from yeartrial y
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by y.${sidx} y.${order} 
+			</when>
+			<otherwise>
+				order by y.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	
+	<select id="queryList1" resultType="com.zhcs.entity.YeartrialEntity">
+		SELECT
+			yeartrial.id,
+			yeartrial.cno,
+			car.cno AS cnoText,
+			yeartrial.yttm,
+			yeartrial.nyttm,
+			yeartrial.ytno,
+			yeartrial.person,
+			sys_user.realname AS personName,
+			yeartrial.cost,
+			yeartrial.addr,
+			yeartrial.unit,
+			yeartrial.`status`,
+			yeartrial.crtid,
+			yeartrial.crttm,
+			yeartrial.updid,
+			yeartrial.updtm
+		FROM
+			yeartrial
+		LEFT JOIN sys_user ON sys_user.id = yeartrial.person
+		INNER JOIN car ON car.id = yeartrial.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(yeartrial.yttm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(yeartrial.yttm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+			
+			
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) FROM
+			yeartrial
+		LEFT JOIN sys_user ON sys_user.id = yeartrial.person
+		INNER JOIN car ON car.id = yeartrial.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(yeartrial.yttm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(yeartrial.yttm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.YeartrialEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into yeartrial
+		(
+			`cno`, 
+			`yttm`, 
+			`nyttm`, 
+			`ytno`,
+			`person`, 
+			`cost`, 
+			`addr`, 
+			`unit`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{cno}, 
+			#{yttm}, 
+			#{nyttm}, 
+			#{ytno},
+			#{person}, 
+			#{cost}, 
+			#{addr}, 
+			#{unit}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.YeartrialEntity">
+		update yeartrial 
+		<set>
+			<if test="cno != null">`cno` = #{cno}, </if>
+			<if test="yttm != null">`yttm` = #{yttm}, </if>
+			<if test="nyttm != null">`nyttm` = #{nyttm}, </if>
+			<if test="ytno != null">`ytno` = #{ytno}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="cost != null">`cost` = #{cost}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="unit != null">`unit` = #{unit}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from yeartrial where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from yeartrial where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

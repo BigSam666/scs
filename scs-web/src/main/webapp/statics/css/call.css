@@ -1,0 +1,81 @@
+@charset "utf-8";
+#row {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#row .img {
+    background-color: #e6e6e6;
+    padding: 2% 0 0 0;
+    text-align: center;
+    height: 100%;
+}
+
+#row .img img {
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+    border-radius: 100px;
+    border: 3px solid #fff;
+}
+
+#row .name {
+    margin: 4% 0 0 0;
+}
+
+#row .name p:nth-child(1) {
+    font-size: 24px;
+    color: #333;
+}
+
+#row .name p:nth-child(2) {
+    font-size: 18px;
+    color: #333;
+}
+
+#row .callnumber {
+    color: #27a93e;
+    font-size: 18px;
+}
+
+#row .img .btn,
+#row .form .submit .btn {
+    padding: 5px 50px;
+}
+
+#row .form {
+    padding: 2% 1%;
+    border: 1px solid #e6e6e6;
+    height: 100%;
+}
+
+#row .form .submit {
+    text-align: center;
+}
+
+#row .maps .input-group {
+    padding: 2% 2%;
+}
+
+#container {
+    position: absolute !important;
+    top: 80px !important;
+    width: 90% !important;
+    height: 500% !important;
+    margin: 0 auto !important;
+    border: 2px solid #999 !important;
+}
+
+.amap-logo,
+.amap-copyright {
+    display: none !important;
+}
+
+#row .maps .input-group span {
+    padding: 0;
+   margin: 0 0 1px 0;
+}
+#row .maps .input-group span button{
+    border-radius: 0;
+}

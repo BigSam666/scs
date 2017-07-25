@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>考勤管理申报</title>
+#parse("sys/header.html")
+<style type="text/css">
+	.aatime {
+		display: inline-block;
+		width: 45%;
+	}
+	.aatext {
+		display: inline-block;
+		width: 7%;
+		text-align: center;
+	}
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("atdmanage:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("atdmanage:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("atdmanage:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">职员</div>
+   	   	<div class="col-sm-10">
+			<input type="hidden" v-model="atdManage.person" name="person" />
+		    <input type="text" class="form-control" style="cursor:pointer;" v-model="atdManage.personName" @click="personTree" readonly="readonly" placeholder="请选择职员"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">申报类型</div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="atdManage.atdtype" name="atdtype" placeholder="申报类型"/> -->
+			<input id="atdtype" class="easyui-combobox" name="atdtype" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group" v-show="isleave">
+   	<div class="col-sm-2 control-label"></div>
+   	   	<div class="col-sm-10">
+<!--       <input type="text" class="form-control" v-model="atdManage.ltype" name="ltype" placeholder="请假类型"/> -->
+		<input type="radio" name="ltype" value="1" id="ltype-1"/><label for="ltype-1">事假</label>
+		<input type="radio" name="ltype" value="2" id="ltype-2"/><label for="ltype-2">病假</label>
+		<input type="radio" name="ltype" value="3" id="ltype-3"/><label for="ltype-3">婚假</label>
+		<input type="radio" name="ltype" value="4" id="ltype-4"/><label for="ltype-4">产假</label>
+    </div>
+       	</div>
+   				   	<div class="form-group" v-show="showFirstGroupTime">
+   	<div class="col-sm-2 control-label" id="firstGroupTime"></div>
+   	   	<div class="col-sm-10">
+   	   	<input type="text" class="form-control aatime" onchange="" name="ftime" id="ftime" onClick="WdatePicker({maxDate:'#F{$dp.$D(\'stime\',{H:-1})}',isShowWeek:true,isShowClear:false,readOnly:true,dateFmt:'yyyy-MM-dd HH:00:00'})" readonly=true/>
+   	   	<div class="aatext">至</div>
+   	   	<input type="text" class="form-control aatime" onchange="" name="stime" id="stime" onClick="WdatePicker({minDate:'#F{$dp.$D(\'ftime\',{H:+1})}',isShowWeek:true,isShowClear:false,readOnly:true,dateFmt:'yyyy-MM-dd HH:00:00'})" readonly=true/>
+    </div>
+       	</div>
+
+   				   	<div class="form-group" v-show="showSecondGroupTime">
+   	<div class="col-sm-2 control-label" id="secondGroupTime"></div>
+   	   	<div class="col-sm-10">
+   	   	<input type="text" class="form-control aatime" onchange="" name="ttime" id="ttime" onClick="WdatePicker({maxDate:'#F{$dp.$D(\'fotime\',{H:-1})}',isShowWeek:true,isShowClear:false,readOnly:true,dateFmt:'yyyy-MM-dd HH:00:00'})" readonly=true/>
+   	   	<div class="aatext">至</div>
+   	   	<input type="text" class="form-control aatime" onchange="" name="fotime" id="fotime" onClick="WdatePicker({minDate:'#F{$dp.$D(\'ttime\',{H:+1})}',isShowWeek:true,isShowClear:false,readOnly:true,dateFmt:'yyyy-MM-dd HH:00:00'})" readonly=true/>
+    </div>
+       	</div>
+		<div class="form-group">
+   	<div class="col-sm-2 control-label">时长</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" name="duration" placeholder="时长" readonly="readonly"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">备注</div>
+   	   	<div class="col-sm-10">
+      <textarea class="form-control" v-model="atdManage.rmk" name="rmk" placeholder="【2-50个汉字】" rows="10" cols="30"></textarea>
+    </div>
+       	</div>
+   				   	<div class="form-group" style="display: none;">
+   	<div class="col-sm-2 control-label">状态</div>
+   	   	<label class="radio-inline">
+	  <input type="radio" name="status" value="1" v-model="atdManage.status"/> 有效
+	</label>
+   	<label class="radio-inline">
+	  <input type="radio" name="status" value="0" v-model="atdManage.status"/> 无效
+	</label>
+       	</div>
+   		#if($shiro.hasPermission("atdmanage:update") || $shiro.hasPermission("atdmanage:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+<!-- 职员 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/atdmanage/atdmanage.js?_${date.systemTime}"></script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.GasDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.GasEntity">
+		select
+			id, 		
+			cno, 		
+			gastm, 		
+			person, 		
+			price, 		
+			unit,
+			type,
+			num, 		
+			cost, 		
+			addr, 		
+			bmile, 		
+			emile, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from gas where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.GasEntity">
+		select
+			g.id, 		
+			g.cno, 	
+			(select c.cno from car c where c.id=g.cno) AS cnoText,	
+			g.gastm, 		
+			g.person, 
+			(select s.name from sys_user s where s.id=g.person) AS personName,			
+			g.price, 		
+			g.unit, 
+			(select bc.cnm from base_code bc where bc.id=g.unit) AS unitName,
+			g.type,
+			(select bc.cnm from base_code bc where bc.id=g.type) AS typeName,
+			g.num,		
+			g.cost, 		
+			g.addr, 		
+			g.bmile, 		
+			g.emile, 		
+			g.status, 		
+			g.crtid, 		
+			g.crttm, 		
+			g.updid, 		
+			g.updtm		
+		from gas g
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by g.${sidx} g.${order} 
+			</when>
+			<otherwise>
+				order by g.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryList1" resultType="com.zhcs.entity.GasEntity">
+		select
+			gas.id, 		
+			gas.cno, 		
+			car.cno AS cnoText,
+			gas.gastm, 		
+			gas.person, 		
+			sys_user.realname AS personName,
+			gas.price, 		
+			gas.unit, 
+			(select bc.cnm from base_code bc where bc.id=gas.unit) AS unitName,
+			gas.type,
+			(select bc.cnm from base_code bc where bc.id=gas.type) AS typeName,
+			gas.num,		
+			gas.cost, 		
+			gas.addr, 		
+			gas.bmile, 		
+			gas.emile, 		
+			gas.status, 		
+			gas.crtid, 		
+			gas.crttm, 		
+			gas.updid, 		
+			gas.updtm		
+		from gas
+		LEFT JOIN sys_user ON sys_user.id = gas.person
+		INNER JOIN car ON car.id = gas.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			
+			
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(gas.gastm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(gas.gastm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from gas
+		LEFT JOIN sys_user ON sys_user.id = gas.person
+		INNER JOIN car ON car.id = gas.cno
+		INNER JOIN fleett ON fleett.id = car.fleett
+		WHERE
+			1 = 1
+			<if test="ids != null and ids != ''">
+			and FIND_IN_SET(fleett.dept,#{ids})
+			</if>
+			
+			
+			<if test="condition !=null and condition.trim() != ''">
+				and	 car.cno like concat('%',#{condition},'%')
+			</if>
+			<if test="starttime !=null and starttime != ''">
+				and	 DATE_FORMAT(gas.gastm,'%Y-%m-%d') &gt;= #{starttime}
+			</if>
+			<if test="endtime !=null and endtime != ''">
+				and	 DATE_FORMAT(gas.gastm,'%Y-%m-%d') &lt;= #{endtime}
+			</if>
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.GasEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into gas
+		(
+			`cno`, 
+			`gastm`, 
+			`person`, 
+			`price`, 
+			`unit`, 
+			`type`,
+			`num`,
+			`cost`, 
+			`addr`, 
+			`bmile`, 
+			`emile`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{cno}, 
+			#{gastm}, 
+			#{person}, 
+			#{price}, 
+			#{unit}, 
+			#{type}, 
+			#{num}, 
+			#{cost}, 
+			#{addr}, 
+			#{bmile}, 
+			#{emile}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.GasEntity">
+		update gas 
+		<set>
+			<if test="cno != null">`cno` = #{cno}, </if>
+			<if test="gastm != null">`gastm` = #{gastm}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="price != null">`price` = #{price}, </if>
+			<if test="unit != null">`unit` = #{unit}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="num != null">`num` = #{num}, </if>
+			<if test="cost != null">`cost` = #{cost}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="bmile != null">`bmile` = #{bmile}, </if>
+			<if test="emile != null">`emile` = #{emile}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from gas where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from gas where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

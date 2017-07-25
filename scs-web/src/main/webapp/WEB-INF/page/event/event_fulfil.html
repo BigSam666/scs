@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>案件</title>
+#parse("sys/header.html")
+<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+<script src="http://webapi.amap.com/maps?v=1.3&key=798c6e4c99c76881ac4de9b2791bc277"></script>
+<script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("event:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("event:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+	<div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+			<div class="form-group">
+				<div class="col-sm-2 control-label">案件图片</div>
+				<div class="col-sm-10">
+					<input type="hidden" class="form-control" v-model="event.qimg" id="qimg" name="qimg" placeholder="处理图片" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">业务板块</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" v-model="event.busseg" name="busseg" placeholder="业务板块" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">事件编号</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" v-model="event.no" name="no" placeholder="事件编号" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">事件来源</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" v-model="event.sour" name="sour" placeholder="事件来源" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">地址</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" v-model="event.addr" name="addr" placeholder="事件来源" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">派单时间</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" v-model="event.dltm" name="dltm" placeholder="派单时间" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">意见反馈</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" v-model="event.des" name="des" placeholder="工作反馈" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label">市民评价</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" v-model="event.evaluate" name="evaluate" placeholder="市民评价" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label"></div>
+				<div class="col-sm-10">
+					<label style="text-align:right;width:100%;" @click="viewDetails" >处理进度</label>
+					<div v-show="showvd">
+						<ul class="treeview" id="tree">
+							<li name="firstLi" id="firstLi" style="display: none;">正在加载...</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="amap_" style="display:none;">
+	<div style="height:28em;width:50%;min-width:40%;position:absolute;top:3em;left:43em;border:1px dashed gray;">
+		<div id="container"></div>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/event/event_fulfil.js?_${date.systemTime}"></script>
+</body>
+</html>

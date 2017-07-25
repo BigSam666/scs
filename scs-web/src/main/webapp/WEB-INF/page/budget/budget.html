@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>预算申报</title>
+#parse("sys/header.html")
+<link rel="stylesheet" href="${rc.contextPath}/statics/plugins/step-jquery-dc/css/step-dc-style2.css" />
+<script type="text/javascript" src="${rc.contextPath}/statics/plugins/step-jquery-dc/js/step-jquery-dc.js"></script>
+<style type="text/css">
+	#budgetDetail td,#businessIncomeBudgetDetail td,#costBudgetDetail td,#seeDetail td,#adjust td,#addBudget td {
+		border: 1px solid #cdcdcd;
+		width: 145px;
+		padding: 3px;
+	}
+	#budgetDetail input,#businessIncomeBudgetDetail input,#costBudgetDetail input,#seeDetail input,#adjust input,#addBudget input {
+		width: 70px;
+		margin-right: 10px;
+		height: 20px;
+	}
+	.switchBtn {
+		float: right;
+	}
+	.grid-btn .btn {
+	    margin-right: 0;
+	}
+	.style1,.style2 {
+		border-radius: 0;
+	}
+	.schedule-detail-progress-bar {
+		height: 150px;
+		width: 404px;
+	    margin: 35px auto !important;
+	    margin-top: 0px !important;
+	}	
+	.schedule-detail-content-item {
+		height: 75px;
+	}	
+	.item-content {
+		padding-top: 5px;
+		border-top: solid 1px #bbb8c0;
+		margin: 10px auto;
+    	width: 450px;
+	}
+	.item-content-1, .item-content-2, .item-content-3 {
+		display:inline-block;
+		height: 60px;
+	}
+	.item-content-1 {
+		float: left;
+		padding-left: 50px;
+	}
+	.item-content-2 {
+		width: 220px;
+		word-wrap: break-word;
+    	overflow: auto;
+	}
+	.item-content-3 {
+		float: right;
+		text-align: right;
+	}
+	.item-content-person {
+		font-weight: bolder;
+	}
+	.item-content-time {
+		font-size: 0.1px;
+	}
+	.item-content-origin {
+		color: gray;
+    	font-size: 1px;
+	}
+	.row {
+		border-top: 0;
+	}
+	.project {
+		width:65%;
+	}
+	.title {
+		width: 420px;
+		margin: 0 auto !important;
+		margin-top: 40px !important;
+	}
+	.title span {
+		margin: 0 5px;
+	}
+	.fold {
+        float: right;
+        margin-right: 50px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<fieldset>
+			<legend>
+				<i class="fa fa-search"></i>&nbsp;条件筛选
+			</legend>
+			<div class="container-fluid">
+				<form class="" id="form-horizontal">
+					<div class="row">
+						<div class="col-sm-4">
+							<span class="alabel">所属项目：</span>
+		    				<input id="qproject" class="easyui-combobox project" name="qproject" readonly=true>
+						</div>
+						<div class="col-sm-2">
+							<a class="btn btn-info" @click="query">查询</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</fieldset>
+		<div class="grid-btn">
+			#if($shiro.hasPermission("budget:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("budget:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("budget:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+			<div class="form-group col-sm-2 switchBtn">
+				<div class="btn-group style">
+					<button type="button" class="btn btn-default style1" id="auditing">审批中</button>
+					<button type="button" class="btn btn-default style2" id="auditFinish">已结束</button>
+				</div>
+			</div>
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">申报人员</div>
+   	   	<div class="col-sm-10">
+      <input type="hidden" class="form-control" v-model="user.id" name="person"/>
+      <input type="text" class="form-control" v-model="user.name" readonly="readonly"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">联系方式</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="user.mobile" readonly="readonly" name="mobile"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">月份</div>
+   	   	<div class="col-sm-10">
+      <input id="month" class="form-control" name="month" style="width:100%;" readonly="readonly" onClick="WdatePicker({dateFmt: 'yyyy-MM'})">
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">所属项目</div>
+   	   	<div class="col-sm-10">
+      <input id="project" class="easyui-combobox" name="project" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">预算明细</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" name="budget-detail" placeholder="请选择" @click="showBdManage" readonly="readonly"/>
+    </div>
+       	</div>
+   																	#if($shiro.hasPermission("budget:update") || $shiro.hasPermission("budget:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+
+<!-- 预算明细 -->
+<div id="budgetDetail" style="display: none;text-indent: 1em;">
+	<form id="budget-detail-form">
+		<table id="budgetDetailTable"></table>
+	</form>
+</div>
+
+<!-- 营业收入预算明细 -->
+<div id="businessIncomeBudgetDetail" style="display: none;text-indent: 1em;">
+	<table id="businessIncomeBudgetDetailTable"></table>
+</div>
+
+<!-- 费用预算明细 -->
+<div id="costBudgetDetail" style="display: none;text-indent: 1em;">
+	<table id="costBudgetDetailTable"></table>
+</div>
+
+<!-- 查看明细 -->
+<div id="seeDetail" style="display: none;text-indent: 1em;">
+	<table id="seeDetailTable"></table>
+</div>
+
+<!-- 调整 -->
+<div id="adjust" style="display: none;text-indent: 1em;">
+	<form id="adjust-form">
+		<table id="adjustTable"></table>
+	</form>
+</div>
+
+<!-- 新增预算 -->
+<div id="addBudget" style="display: none;text-indent: 1em;">
+	<form id="addBudget-form">
+		<table id="addBudgetTable"></table>
+	</form>
+</div>
+
+<!-- 进度详情 -->
+<div id="schedule-detail" style="display: none;text-indent: 1em;">
+	<div class="title">
+		<span>发起申报</span>
+		<span>项目部审批</span>
+		<span>事业部审批</span>
+		<span>财务部审批</span>
+		<span>副总审批</span>
+	</div>
+	<div class="schedule-detail-progress-bar step_context">
+		
+	</div>
+	<div class="schedule-detail-content">
+		
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/budget/budget.js?_${date.systemTime}"></script>
+</body>
+</html>

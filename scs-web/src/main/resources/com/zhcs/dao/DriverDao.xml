@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.DriverDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.DriverEntity">
+		select
+			id, 		
+			dno, 		
+			dclass, 		
+			bdate, 		
+			edate, 		
+			driverId, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from driver where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.DriverEntity">
+		select
+			d.id, 	
+			d.dno,	
+			d.dclass, 	
+			(select group_concat(bc.cnm) from base_code bc where FIND_IN_SET (bc.id,d.dclass)) AS dclassName,
+			d.bdate, 	
+			d.edate, 	
+			d.driverId,
+			d.status, 		
+			d.crtid, 		
+			d.crttm, 		
+			d.updid, 		
+			d.updtm		
+		from driver d
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by d.${sidx} d.${order} 
+			</when>
+			<otherwise>
+				order by d.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<resultMap type="com.zhcs.entity.DriverEntity" id="fullList">  
+        <id column="id" property="id" />  
+        <result column="dno" property="dno" />  
+        <result column="dclass" property="dclass" />  
+        <result column="dclassName" property="dclassName" />  
+        <result column="bdate" property="bdate" />  
+        <result column="edate" property="edate" />  
+        <result column="driverId" property="driverId" />  
+        <!-- 一对一的关系 -->  
+        <!-- property: 指的是属性的值, javaType：指的是元素的类型 -->  
+        <association property="driverEntity" javaType="com.zhcs.entity.SysUserEntity">  
+            <id column="did" property="id" />  
+            <result column="dwechatid" property="wechatid" />  
+            <result column="dname" property="name" />  
+            <result column="demail" property="email" />  
+            <result column="dmobile" property="mobile" />  
+            <result column="dstatus" property="status" />  
+            <result column="droleTextList" property="roleTextList" />  
+            <result column="ddeptTextList" property="deptTextList" />  
+        </association>  
+    </resultMap> 
+    
+	<select id="queryFullList" resultType="java.util.Map">
+		select
+			d.id, 	
+			d.dno,	
+			d.dclass, 	
+			(select group_concat(bc.cnm) from base_code bc where FIND_IN_SET (bc.id,d.dclass)) AS dclassName,	
+			d.driverId,
+			DATE_FORMAT(d.bdate,'%Y-%m-%d') bdate, 	
+			DATE_FORMAT(d.edate,'%Y-%m-%d') edate, 		
+			d.status, 		
+			d.crtid, 		
+			d.crttm, 		
+			d.updid, 		
+			d.updtm,
+			su.id did,
+			su.name dname,	
+			su.email demail,	
+			su.mobile dmobile,	
+			su.cardno dcardno,
+			su.status dstatus,
+			(select group_concat(sr.name) from sys_role sr,sys_user_role sur where sur.userid = d.driverId and sur.roleid=sr.id)
+			 AS droleTextList,
+			(select group_concat(sd.name) from sys_department sd,sys_user_dept sud where sud.userid = d.driverId and sud.deptid=sd.id)
+			AS ddeptTextList
+		from 
+			driver d,
+			sys_user su
+		where 
+			d.driverId = su.id
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by d.${sidx} d.${order} 
+			</when>
+			<otherwise>
+				order by d.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryFullList1" resultType="java.util.Map">
+		select
+			d.id, 	
+			d.dno,	
+			d.dclass, 	
+			(select group_concat(bc.cnm) from base_code bc where FIND_IN_SET (bc.id,d.dclass)) AS dclassName,	
+			d.driverId,
+			DATE_FORMAT(d.bdate,'%Y-%m-%d') bdate, 	
+			DATE_FORMAT(d.edate,'%Y-%m-%d') edate, 		
+			d.status, 		
+			d.crtid, 		
+			d.crttm, 		
+			d.updid, 		
+			d.updtm,
+			su.id did,
+			su.name dname,	
+			su.realname drealname,
+			su.email demail,	
+			su.mobile dmobile,	
+			su.cardno dcardno,
+			su.status dstatus,
+			(select group_concat(sr.name) from sys_role sr,sys_user_role sur where sur.userid = d.driverId and sur.roleid=sr.id)
+			 AS droleTextList,
+			(select group_concat(sd.name) from sys_department sd,sys_user_dept sud where sud.userid = d.driverId and sud.deptid=sd.id)
+			AS ddeptTextList
+		from 
+			driver d,
+			sys_user su,
+			sys_user_dept dept
+		where 
+			d.driverId = su.id
+		AND su.id = dept.userid
+		<if test="ids != null and ids != ''">
+			AND FIND_IN_SET(dept.deptid,#{ids})
+		</if>
+		<if test="condition !=null and condition.trim() != ''">
+				and	 su.realname like concat('%',#{condition},'%')
+		</if>
+		
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by d.${sidx} d.${order} 
+			</when>
+			<otherwise>
+				order by d.id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from 
+			driver d,
+			sys_user su,
+			sys_user_dept dept
+		where 
+			d.driverId = su.id
+		AND su.id = dept.userid
+		<if test="ids != null and ids != ''">
+			AND FIND_IN_SET(dept.deptid,#{ids})
+		</if>
+		<if test="condition !=null and condition.trim() != ''">
+				and	 su.realname like concat('%',#{condition},'%')
+		</if>
+		
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.DriverEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into driver
+		(
+			`dno`,
+			`dclass`, 
+			`bdate`, 
+			`edate`, 
+			`driverId`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{dno},
+			#{dclass}, 
+			#{bdate}, 
+			#{edate}, 
+			#{driverId}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.DriverEntity">
+		update driver 
+		<set>
+			<if test="dno != null">`dno` = #{dno}, </if>
+			<if test="dclass != null">`dclass` = #{dclass}, </if>
+			<if test="bdate != null">`bdate` = #{bdate}, </if>
+			<if test="edate != null">`edate` = #{edate}, </if>
+			<if test="driverId != null">`driverId` = #{driverId}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from driver where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from driver where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>人员终端</title>
+#parse("sys/header.html")
+<style>
+		.keyword {
+			display: inline-block;
+			width: 70%;
+		}
+		.row {
+			border-top: 0;
+		}
+		.qdevtype {
+			width:65%;
+		}
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<fieldset>
+			<legend>
+				<i class="fa fa-search"></i>&nbsp;条件筛选
+			</legend>
+			<div class="container-fluid">
+				<form class="" id="form-horizontal">
+					<div class="row">
+						<div class="col-sm-4">
+							<span class="alabel">设备类型：</span>
+							<input id="qdevtype" class="easyui-combobox qdevtype" name="qdevtype" readonly=true>
+						</div>
+						<div class="col-sm-4">
+							<span class="alabel">关键字：</span>
+							<input type="text" class="form-control keyword" name="keyword" placeholder="使用人|号码|编号" v-model="q.keyword"/>
+						</div>
+						<div class="col-sm-2">
+							<a class="btn btn-info" @click="query">查询</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</fieldset>
+		<div class="grid-btn">
+			#if($shiro.hasPermission("personterminal:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("personterminal:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("personterminal:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+					   	<div class="form-group">
+   	<div class="col-sm-2 control-label">设备类型</div>
+   	   	<div class="col-sm-10">
+			<input id="devtype" class="easyui-combobox" name="devtype" style="width:100%;" readonly=true>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">手机号码</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="personterminal.phone" name="phone" placeholder="手机号码"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">设备编号</div>
+   	   	<div class="col-sm-10">
+      <input type="text" class="form-control" v-model="personterminal.devno" name="devno" placeholder="设备编号"/>
+    </div>
+       	</div>
+   				   	<div class="form-group">
+   	<div class="col-sm-2 control-label">使用人</div>
+   	   	<div class="col-sm-10">
+			<input type="hidden" v-model="personterminal.person" name="person" />
+		    <input type="text" class="form-control" style="cursor:pointer;" v-model="personterminal.personName" @click="personTree" readonly="readonly" placeholder="使用人"/>
+    </div>
+       	</div>
+   																	#if($shiro.hasPermission("personterminal:update") || $shiro.hasPermission("personterminal:save"))
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+		</div>
+		#end
+		</form>
+	</div>
+</div>
+
+<!-- 办理人员 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/personterminal/personterminal.js?_${date.systemTime}"></script>
+</body>
+</html>

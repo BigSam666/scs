@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.PersonterminalDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.PersonterminalEntity">
+		select
+			id, 		
+			devtype, 		
+			phone, 		
+			devno, 		
+			person, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from personterminal where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.PersonterminalEntity">
+		select
+			p.id, 		
+			p.devtype, 
+			ifnull((select bc.cnm from base_code bc where bc.id=p.devtype),'所有') AS devtypeName,		
+			p.phone, 		
+			p.devno, 		
+			p.person, 
+			(select s.name from sys_user s where s.id=p.person) AS personName,		
+			p.crtid, 		
+			p.crttm, 		
+			p.updid, 
+			(select s.name from sys_user s where s.id=p.updid) AS updName,		
+			p.updtm		
+		from personterminal p
+		<where>
+			<if test="qdevtype != null">
+				and p.devtype = #{qdevtype}
+			</if>
+			<if test="keyword != null">
+				and ((p.phone = #{keyword}) OR (p.devno = #{keyword}) OR ((select s.name from sys_user s where s.id=p.person) = #{keyword}))
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by p.${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by p.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from personterminal 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.PersonterminalEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into personterminal
+		(
+			`devtype`, 
+			`phone`, 
+			`devno`, 
+			`person`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{devtype}, 
+			#{phone}, 
+			#{devno}, 
+			#{person}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.PersonterminalEntity">
+		update personterminal 
+		<set>
+			<if test="devtype != null">`devtype` = #{devtype}, </if>
+			<if test="phone != null">`phone` = #{phone}, </if>
+			<if test="devno != null">`devno` = #{devno}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from personterminal where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from personterminal where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

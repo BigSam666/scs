@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>统计分析_事件统计</title>
+#parse("sys/header.html")
+<style>
+	.form-control {
+		display: inline-block;
+		width: 70%;
+	}
+	.row {
+		border-top: 0;
+	}
+	.alabel {
+		display: inline-block;
+		width: 85px;
+		text-align: right;
+	}
+	.input-time {
+		width: 55%;
+	}
+	#timetype {
+		width: 65%;
+	}
+</style>
+<script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+<script src="http://cdn.hcharts.cn/highcharts/modules/data.js"></script>
+<script src="http://cdn.hcharts.cn/highcharts/modules/exporting.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div>
+		<div class="grid-btn">
+			<fieldset>
+				<legend>
+					<i class="fa fa-search"></i>&nbsp;条件筛选
+				</legend>
+				<div class="container-fluid">
+					<form class="" id="form-horizontal">
+						<div class="row">
+							<div class="col-sm-4">
+								<span class="alabel">选人：</span>
+								<input type="hidden" v-model="person" name="person" />
+			    				<input type="text" class="form-control" style="cursor:pointer;" v-model="personName" @click="personTree" readonly="readonly" placeholder="请选人"/>
+							</div>
+							<div class="col-sm-4">
+								<span class="alabel">业务板块：</span><input type="text" class="form-control" value="清扫保洁" readonly="readonly" name="bizseg"/>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-4">
+								<span class="alabel">时间类型：</span>
+								<input id="timetype" class="easyui-combobox" name="timetype" data-options="readonly: true">
+							</div>
+							<div class="col-sm-5">
+								<span class="alabel">选择时间段：</span>
+								<input type="text" class="form-control input-time" value="" readonly=true name="ftime"/>
+								<div style="display: inline;">
+									至<input type="text" class="form-control input-time" value="" readonly=true name="stime"/>
+								</div>
+							</div>
+							<div class="col-sm-2">
+								<a class="btn btn-info" @click="query">查询</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div class="panel panel-default">
+		<div id="container" style="min-width:400px;height:400px"></div>
+	</div>
+
+<!-- 办理人员 -->
+<div id="personLayer" style="display: none;padding:10px;">
+	<ul id="personTree" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/coststatistics/coststatistics.js?_${date.systemTime}"></script>
+</body>
+</html>

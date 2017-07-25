@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>控制台</title>
+<script src="${rc.contextPath}/statics/libs/jquery.min.js"></script>
+<script src="${rc.contextPath}/statics/plugins/leowather/js/jquery.leoweather.min.js"></script>
+<script src="${rc.contextPath}/statics/plugins/callpop/md5.min.js"></script>
+<script src="${rc.contextPath}/statics/plugins/callpop/callpop.js"></script>
+<script src="${rc.contextPath}/statics/libs/util.min.js"></script>
+<style>
+	body  { font:14px/1.5 微软雅黑; text-align:center; }
+	#text { width:60em; margin:0 auto; margin-top:50px; background:#fafafa; border:1px solid #ddd; padding:30px 0; overflow:hidden; cursor: default;}
+	#view { width:780px; margin:60px auto; background:#3c8dbc; color:#FFF; padding:50px 0 100px 0; overflow:hidden; border-radius:5000px; cursor: default; }
+	#view i { background: no-repeat top left; display:inline-block; height:128px; line-height:128px; margin:0 auto 20px auto; font-size:70px; padding-left:150px; font-style:normal; text-align:center; font-weight:bold; }
+	#view i.icon-xiaoyu { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/xiaoyu.png); }
+	#view i.icon-zhongyu { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/zhongyu.png); }
+	#view i.icon-dayu { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/dayu.png); }
+	#view i.icon-qing { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/qing.png); }
+	#view i.icon-duoyun { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/duoyun.png); }
+	#view i.icon-zhenyu { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/zhenyu.png); }
+	#view i.icon-leizhenyu { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/leizhenyu.png); }
+	#view i.icon-yin { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/yin.png); }
+	#view i.icon-baoyu { background-image:url(${rc.contextPath}/statics/plugins/leowather/icon/baoyu.png); }
+	#view p { background:rgba(0,0,0,.3); margin:0 200px; padding:20px; border-radius:1000px; font-size:16px; }
+	#view p span { margin:0 15px; }
+</style>
+</head>
+<body>
+<div id="text">
+	<script>$('#text').leoweather({format:'\u6b22\u8fce\u4f7f\u7528\u667a\u6167\u57ce\u5e023.0\u7cfb\u7edf\uff0c\u73b0\u5728\u662f\uff1a{\u5e74}/{\u6708}/{\u65e5} {\u65f6}:{\u5206}:{\u79d2} \u661f\u671f{\u5468} '});</script>
+</div>
+<div id="view">
+	<script>$('#view').leoweather({format:'<i class="icon-{\u56fe\u6807}">{\u6c14\u6e29}℃</i><p>{\u57ce\u5e02}<span>|</span>{\u5929\u6c14}<span>|</span>{\u98ce\u5411}{\u98ce\u7ea7}\u7ea7</p>'});</script>
+</div>
+</body>
+</html>

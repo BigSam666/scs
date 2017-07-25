@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.BaseCodeDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.BaseCodeEntity">
+		select
+			id, 		
+			no, 		
+			type, 		
+			cnm, 		
+			attv, 		
+			valid, 		
+			sort, 		
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from base_code where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.BaseCodeEntity">
+		select
+			id, 		
+			no, 		
+			type, 		
+			cnm, 		
+			attv, 		
+			valid, 		
+			sort, 		
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from base_code 
+		order by type, no
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from base_code 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.BaseCodeEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into base_code
+		(
+			`no`, 
+			`type`, 
+			`cnm`, 
+			`attv`, 
+			`valid`, 
+			`sort`, 
+			`rmk`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{no}, 
+			#{type}, 
+			#{cnm}, 
+			#{attv}, 
+			#{valid}, 
+			#{sort}, 
+			#{rmk}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.BaseCodeEntity">
+		update base_code 
+		<set>
+			<if test="no != null">`no` = #{no}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="cnm != null">`cnm` = #{cnm}, </if>
+			<if test="attv != null">`attv` = #{attv}, </if>
+			<if test="valid != null">`valid` = #{valid}, </if>
+			<if test="sort != null">`sort` = #{sort}, </if>
+			<if test="rmk != null">`rmk` = #{rmk}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from base_code where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from base_code where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="selectByType" resultType="com.zhcs.entity.BaseCodeEntity">
+		select 
+			id, 		
+			no, 		
+			type, 		
+			cnm, 		
+			attv, 		
+			sort, 		
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm
+		from base_code where type=#{type} and valid != '0' order by 'sort'
+	</select>
+
+	<select id="selectByTypeValue" resultType="com.zhcs.entity.BaseCodeEntity">
+		select 
+			id, 		
+			no, 		
+			type, 		
+			cnm, 		
+			attv, 		
+			valid, 		
+			sort, 		
+			rmk, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm
+		from base_code where type=#{type} and no=#{no}
+	</select>
+
+</mapper>

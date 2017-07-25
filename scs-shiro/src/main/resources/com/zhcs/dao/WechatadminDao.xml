@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.WechatadminDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.WechatadminEntity">
+		select
+			id, 		
+			openid, 		
+			subscribe, 		
+			nickname, 		
+			sex, 		
+			city, 		
+			country, 		
+			province, 		
+			language, 		
+			headimgurl, 		
+			subscribe_time, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from wechatadmin where id = #{value}
+	</select>
+	
+	<select id="queryObjectByOpenid" resultType="com.zhcs.entity.WechatadminEntity">
+		select
+			id, 		
+			openid, 		
+			subscribe, 		
+			nickname, 		
+			sex, 		
+			city, 		
+			country, 		
+			province, 		
+			language, 		
+			headimgurl, 		
+			subscribe_time, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from wechatadmin where openid = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.WechatadminEntity">
+		select
+			id, 		
+			openid, 		
+			subscribe, 		
+			nickname, 		
+			sex, 		
+			city, 		
+			country, 		
+			province, 		
+			language, 		
+			headimgurl, 		
+			subscribe_time, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from wechatadmin 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by id 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from wechatadmin 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.WechatadminEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into wechatadmin
+		(
+			`openid`, 
+			`subscribe`, 
+			`nickname`, 
+			`sex`, 
+			`city`, 
+			`country`, 
+			`province`, 
+			`language`, 
+			`headimgurl`, 
+			`subscribe_time`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{openid}, 
+			#{subscribe}, 
+			#{nickname}, 
+			#{sex}, 
+			#{city}, 
+			#{country}, 
+			#{province}, 
+			#{language}, 
+			#{headimgurl}, 
+			#{subscribeTime}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.WechatadminEntity">
+		update wechatadmin 
+		<set>
+			<if test="openid != null">`openid` = #{openid}, </if>
+			<if test="subscribe != null">`subscribe` = #{subscribe}, </if>
+			<if test="nickname != null">`nickname` = #{nickname}, </if>
+			<if test="sex != null">`sex` = #{sex}, </if>
+			<if test="city != null">`city` = #{city}, </if>
+			<if test="country != null">`country` = #{country}, </if>
+			<if test="province != null">`province` = #{province}, </if>
+			<if test="language != null">`language` = #{language}, </if>
+			<if test="headimgurl != null">`headimgurl` = #{headimgurl}, </if>
+			<if test="subscribeTime != null">`subscribe_time` = #{subscribeTime}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	 
+	<update id="updateSubscribeState">
+		update wechatadmin set subscribe = #{1}
+		where openid = #{0}
+	</update>
+	
+	<delete id="delete">
+		delete from wechatadmin where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from wechatadmin where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

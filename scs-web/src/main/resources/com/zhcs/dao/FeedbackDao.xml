@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.FeedbackDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.FeedbackEntity">
+		select
+			id, 		
+			infosource, 		
+			problemtype, 		
+			img, 		
+			content, 		
+			person, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from feedback where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.FeedbackEntity">
+		select
+			f.id, 		
+			f.infosource, 		
+			f.problemtype, 		
+			f.img, 		
+			f.content, 		
+			f.person, 		
+			f.crtid, 		
+			f.crttm, 		
+			f.updid, 		
+			f.updtm		
+		from feedback f,sys_user u
+		<where>
+			f.person = u.id
+			<if test="name != null">
+				and ((u.mobile = #{name}) OR (u.email = #{name}) OR  (f.wechatid = #{name}))
+			</if>
+			<if test="type != null">
+				and f.problemtype = #{type}
+			</if>
+			<if test="info != null">
+				and f.infosource = #{info}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by f.${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by f.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryListMap" resultType="java.util.Map">
+		select
+			f.id, 		
+			f.infosource, 		
+			f.problemtype, 		
+			f.img, 		
+			f.content, 		
+			f.person, 		
+			f.crtid, 		
+			f.crttm, 		
+			f.updid, 		
+			f.updtm		
+		from feedback f,sys_user u
+		<where>
+			f.person = u.id
+			<if test="name != null">
+				and ((u.mobile = #{name}) OR (u.email = #{name}) OR  (u.wechatid = #{name}))
+			</if>
+			<if test="type != null">
+				and f.problemtype = #{type}
+			</if>
+			<if test="info != null">
+				and f.infosource = #{info}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by f.${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by f.updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from feedback 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.FeedbackEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into feedback
+		(
+			`infosource`, 
+			`problemtype`, 
+			`img`, 
+			`content`, 
+			`person`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{infosource}, 
+			#{problemtype}, 
+			#{img}, 
+			#{content}, 
+			#{person}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.FeedbackEntity">
+		update feedback 
+		<set>
+			<if test="infosource != null">`infosource` = #{infosource}, </if>
+			<if test="problemtype != null">`problemtype` = #{problemtype}, </if>
+			<if test="img != null">`img` = #{img}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="person != null">`person` = #{person}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from feedback where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from feedback where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.OperationplanDao">
+	
+	<select id="queryBanCiMap" resultType="java.util.Map">
+		SELECT id,classes FROM classes;
+	</select>
+	
+	<select id="queryMonth" resultType="string">
+		SELECT optime FROM operationplan WHERE optime = #{date};
+	</select>
+	
+	<select id="queryId" resultType="String">
+		SELECT optime FROM operationplan WHERE id = #{value};
+	</select>
+	
+	<!-- 根据项目部查询排班主表信息 -->
+	<select id="queryByProject" resultType="com.zhcs.entity.OperationplanEntity">
+		SELECT 
+			id,
+			optime,
+			dept,
+			banci,
+			bsment,
+			cla 
+		FROM operationplan 
+		WHERE dept in  
+		<foreach item="item" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="queryDataListConctOptm" resultType="java.util.Map">
+		SELECT
+			id,
+			oid,
+			DATE_FORMAT(optime,'%Y-%m-%d') optime,
+			shift,
+			cla,
+			member,
+			driver,
+			car,
+			status,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		FROM
+			operationplandata
+		WHERE
+			oid = #{oid}
+	</select>
+	
+	<select id="queryDataListConctOptmByOids" resultType="java.util.Map" parameterType="java.lang.String">
+		SELECT
+			id,
+			oid,
+			DATE_FORMAT(optime,'%Y-%m-%d') optime,
+			shift,
+			cla,
+			member,
+			driver,
+			car,
+			status,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		FROM
+			operationplandata
+		WHERE
+			oid in  ($(oids))
+	</select>
+	
+ 	<!-- 查询用户对应的班级 -->
+ 	<select id="queryDept" resultType="java.util.Map">
+ 		SELECT
+			id value,name text
+		FROM
+			sys_department
+		WHERE
+			FIND_IN_SET(
+				id,
+				(
+					SELECT
+						GROUP_CONCAT(id)
+					FROM
+						sys_department
+					WHERE
+						otype = #{otype}
+				)
+			)
+		AND FIND_IN_SET(
+			id,
+			queryDept (
+				(
+					SELECT
+						de.id
+					FROM
+						sys_user_dept us,
+						sys_department de
+					WHERE
+						us.deptid = de.id
+					AND userid = #{userid}
+					LIMIT 0, 1
+				)
+			)
+		);
+ 	</select>
+ 	
+ 	<select id="queryDeptname" resultType="java.util.Map">
+ 		SELECT
+			us.id value,
+			us.realname text
+		FROM
+			sys_department de,
+			sys_user_dept ud,
+			sys_user us
+		WHERE
+			de.id = ud.deptid
+		AND us.id = ud.userid
+		AND de.id = #{value}
+ 	</select>
+ 	
+ 	<select id="queryDrivername" resultType="string">
+ 		SELECT
+		IF (
+			(
+				SELECT
+					us. NAME
+				FROM
+					sys_user us,
+					driver dr
+				WHERE
+					us.id = dr.driverId
+				AND us.id = #{dept}
+			) IS NOT NULL, 1, 0
+		) AS dno
+ 	</select>
+ 	
+ 	<select id="queryCar" resultType="java.util.Map">
+ 		SELECT
+			ca.id value,
+			ca.cno text
+		FROM
+			fleett fl,
+			sys_department de,
+			car ca
+		WHERE
+			ca.fleett = fl.id
+		AND fl.dept = de.id
+		AND de.id = #{deptname}
+ 	</select>
+
+ 	<select id="querySEdate" resultType="com.zhcs.entity.ClassesEntity">
+ 		SELECT c.id,c.classes,c.starttime,c.emdtime FROM classes c WHERE c.id in
+ 		  <foreach item="id" collection="array" open="(" separator="," close=")">
+		        #{id}
+		  </foreach>
+ 	</select>
+
+ 	<select id="queryODB" resultType="com.zhcs.entity.OperationplanEntity">
+ 		SELECT
+ 			`id`,
+			`optime`,
+			`dept`,
+			`bsment`,
+			`cla`,
+			`banci`,
+			`status`,
+			`crtid`,
+			`crttm`,
+			`updid`,
+			`updtm`
+		FROM
+			operationplan
+		WHERE
+			optime = #{optime}
+		AND dept = #{dept}
+		AND bsment = #{bsment};
+ 	</select>
+ 	
+ 	<select id="queryCla" resultType="String">
+ 		SELECT dp.name FROM sys_user u, sys_user_dept sd,sys_department dp WHERE u.id = sd.userid and sd.deptid = dp.id AND u.name = #{cla};
+ 	</select>
+ 	
+ 	<select id="queryDataList" resultType="java.util.Map">
+ 		SELECT
+ 			`id`, 
+			`optime`, 
+			`dept`, 
+			`bsment`, 
+			`cla`,
+			`banci`,
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		FROM
+			operationplan
+		WHERE
+			id = #{oid};
+ 	</select>
+ 	
+	<insert id="save" parameterType="com.zhcs.entity.OperationplanEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into operationplan
+		(
+			`optime`, 
+			`dept`, 
+			`bsment`, 
+			`cla`,
+			`banci`,
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{optime}, 
+			#{dept}, 
+			#{bsment}, 
+			#{cla}, 
+			#{banci}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	
+	<insert id="saveData" parameterType="com.zhcs.entity.OperationplandataEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into operationplandata
+		(
+			`oid`, 
+			`optime`, 
+			`shift`, 
+			`cla`, 
+			`member`, 
+			`driver`, 
+			`car`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{oid}, 
+			#{optime}, 
+			#{shift}, 
+			#{cla}, 
+			#{member}, 
+			#{driver}, 
+			#{car}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	
+	<select id="queryObjects" resultType="java.util.Map">
+		SELECT
+			id,
+			oid,
+			DATE_FORMAT(optime,'%Y-%m-%d') optime,
+			shift,
+			cla,
+			member,
+			driver,
+			car,
+			status,
+			crtid,
+			crttm,
+			updid,
+			updtm
+		FROM
+			operationplandata
+		WHERE
+			oid = #{oid}
+	</select>
+	
+	<select id="queryOpList" resultType="java.util.Map">
+		SELECT
+			`id`, 
+			`optime`, 
+			`dept`, 
+			`bsment`, 
+			`cla`,
+			`banci`,
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		FROM
+			operationplan
+		WHERE
+			id = #{value}
+	</select>
+
+	<select id="queryLists" resultType="java.util.Map">
+		SELECT
+			op.id,
+			op.optime,
+		  	(SELECT de.name FROM sys_department de WHERE de.id = op.dept) dept,
+			(SELECT bc.cnm from base_code bc WHERE bc.type = 'biztype' and bc.no = op.bsment) bsment,
+			(SELECT GROUP_CONCAT(de.name) from sys_department de WHERE FIND_IN_SET(de.id , op.cla)) cla,
+			op.status,
+			(SELECT su.realname FROM sys_user su WHERE su.id = op.crtid) crtid,
+			op.crttm,
+			op.updid,
+			op.updtm
+		FROM
+			operationplan op
+		<where>
+			<if test="name != null and name != ''">
+				and concat_ws(',',(SELECT su.realname FROM sys_user su WHERE su.id = op.crtid), (SELECT de.name FROM sys_department de WHERE de.id = op.dept)) like concat('%',#{name},'%') 
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryLists1" resultType="java.util.Map">
+		SELECT
+			op.id,
+			op.optime,
+			sys_department.`name` AS dept,
+			(SELECT bc.cnm from base_code bc WHERE bc.type = 'biztype' and bc.no = op.bsment) bsment,
+			(SELECT GROUP_CONCAT(de.name) from sys_department de WHERE FIND_IN_SET(de.id , op.cla)) cla,
+			op.status,
+			sys_user.realname AS crtid,
+			op.crttm,
+			op.updid,
+			op.updtm
+		FROM
+			operationplan op
+		LEFT JOIN sys_user ON sys_user.id = op.crtid
+		INNER JOIN sys_department ON sys_department.id = op.dept
+		<where>
+			<if test="ids != null and ids != ''">
+				and FIND_IN_SET(op.dept,#{ids})
+			</if>
+			<if test="name != null and name != ''">
+				and concat_ws(',',(SELECT su.realname FROM sys_user su WHERE su.id = op.crtid), (SELECT de.name FROM sys_department de WHERE de.id = op.dept)) like concat('%',#{name},'%') 
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select 
+			count(*) 
+		from 
+			operationplan op
+		LEFT JOIN sys_user ON sys_user.id = op.crtid
+		INNER JOIN sys_department ON sys_department.id = op.dept
+		<where>
+			<if test="ids != null and ids != ''">
+				and FIND_IN_SET(op.dept,#{ids})
+			</if>
+			<if test="name != null and name != ''">
+				and concat_ws(',',(SELECT su.realname FROM sys_user su WHERE su.id = op.crtid), (SELECT de.name FROM sys_department de WHERE de.id = op.dept)) like concat('%',#{name},'%') 
+			</if>
+		</where>
+	</select>
+	
+	<delete id="delete">
+		delete from operationplan where id = #{value};
+		delete from operationplandata where oid = #{value};
+	</delete>
+	
+	
+	<delete id="deleteup">
+		delete from operationplandata where oid = #{oid};
+	</delete>
+	
+	<insert id="updatedata" parameterType="com.zhcs.entity.OperationplandataEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into operationplandata
+		(
+			`oid`, 
+			`optime`, 
+			`shift`, 
+			`cla`, 
+			`member`, 
+			`driver`, 
+			`car`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{oid}, 
+			#{optime}, 
+			#{shift}, 
+			#{cla}, 
+			#{member}, 
+			#{driver}, 
+			#{car}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	
+	<insert id="copy" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+		insert into operationplan
+		(
+			`optime`, 
+			`dept`, 
+			`bsment`, 
+			`cla`,
+			`banci`,
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		select
+			#{optime}, 
+			`dept`, 
+			`bsment`, 
+			`cla`,
+			`banci`,
+			`status`, 
+			`crtid`, 
+			now(), 
+			`updid`, 
+			now()
+		from
+			operationplan
+		where
+			id = #{getid};
+	</insert>
+	
+</mapper>

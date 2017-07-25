@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>作业计划数据</title>
+	#parse("sys/header.html")
+<style>
+	<!--
+	tbody td{
+		vertical-align: inherit !important;
+	}
+	.vis-hidden{
+		visibility:hidden;
+	}
+	.panel.combo-p{
+		z-index:19891018 !important;
+	}
+	-->
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("operationplandata:save"))
+				<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增计划</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("operationplandata:update"))
+			<!-- <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> -->
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("operationplandata:delete"))
+			<!-- <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a> -->
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+	<!-- 新增计划 -->
+	<div id="addbanci" style="display:none">
+		<form class="form-horizontal center-block" id="validate">
+			<div class="box-body">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">所属项目部:</label>
+					<div class="col-sm-10">
+						<input id="project" class="easyui-combobox" name="project"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">业务板块:</label>
+					<div class="col-sm-10">
+						<input id="serviceType" class="easyui-combobox" name="busseg"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">选择日期:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" placeholder="请选择" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',onpicking:function(dp){vm.time = dp.cal.getNewDateStr()}})" v-model="time" name="time" readonly="readonly" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">选择班次:</label>
+					<div class="checkbox col-sm-10">
+						<label v-for="item in shift">
+							<input type="checkbox" :value="item.id" v-model="pop.banci" name="banci"/>{{item.classes}} &nbsp;
+						</label>
+					</div>
+				</div>
+				<div id="next" class="form-group ">
+					<label class="col-sm-2 control-label"></label>
+					<div class="checkbox col-sm-10">
+						<label>
+							<button type="button"  class="btn btn-block btn-success"  @click="addData">下一步</button>
+						</label>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<!-- 制定计划 -->
+	<div id="makingplan" style="display:none">
+		<form id="forms">
+			<table class="table table-bordered table-striped text-center">
+				<thead>
+				<tr>
+					<th class="text-center">日期</th>
+					<th class="text-center">班次/时段</th>
+					<th class="text-center">班级</th>
+					<th class="text-center">成员</th>
+					<th class="text-center">司机</th>
+					<th class="text-center">车辆</th>
+				<tr>
+				</thead>
+				<tbody>
+				<!--
+					 * Once you are done trying to 'optimize' this routine,
+					 * and have realized what a terrible mistake that was,
+					 * please increment the following counter as a warning
+					 * to the next guy:
+					 * total_hours_wasted_here = 80
+				 -->
+				<template v-for="(day, index) in datas.days">
+					<template v-for="(sedate, index2) in datas.sedate">
+						<template v-for="(business, index3) in datas.business">
+							<template v-for="(nmap, index4) in datas.nmap">
+								<template v-if="datas.business[index3].value == nmap.name">
+									<template v-for="(user, index5) in nmap.value">
+										<tr>
+											<td :rowspan="datas.sedate.length * lengths" v-if="index2 === 0 && index3 === 0 && index4 ===0 && index5 ===0">{{day.text}}</td>
+											<td :rowspan="lengths" v-if="index3 === 0 && index4 ===0 && index5 ===0">{{sedate.classes}}<br/>{{sedate.starttime}}-{{sedate.emdtime}}</td>
+											<td :rowspan="datas.bl[index3]" v-if="index5 ===0">{{business.text}}</td>
+											<td class="text-justify" style="text-indent:2em"><input type="checkbox" :name="day.value+'#'+sedate.id+'#'+business.value+'#'+user.value" :value="day.value+'#'+sedate.id+'#'+business.value+'#'+user.value" />&nbsp;{{user.text}}</td>
+											<td><input type="checkbox" :name="day.value+'#'+sedate.id+'#'+business.value+'#'+user.value+'#driver' " :value="day.value+'#'+sedate.id+'#'+business.value+'#'+user.value+'#driver' " /></td>
+											<td class="text-justify" style="text-indent:2em">
+												<input type="radio" :name="day.value+'#'+sedate.id+'#'+business.value+'#'+user.value+'#driver#car' " value="0" />&nbsp;无
+												<template v-for="car in datas.carlist">
+													<input type="radio" :name="day.value+'#'+sedate.id+'#'+business.value+'#'+user.value+'#driver#car' " :value="car.value" />&nbsp;{{car.text}}
+												</template>
+											</td>
+										</tr>
+									</template>
+								</template>
+							</template>
+						</template>
+					</template>
+				</template>
+				</tbody>
+			</table>
+			<div class="box box-danger" id="sbutton">
+				<div class="box-body">
+					<div class="row">
+						<div class="col-xs-2 col-md-offset-5">
+							<button type="button" class="btn btn-block btn-success" @click="save">提交</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="vis-hidden">.</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/operationplandata/operationplandata.js?_${date.systemTime}"></script>
+</body>
+</html>

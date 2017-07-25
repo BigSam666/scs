@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Load Dynamic ComboBox Data - jQuery EasyUI Demo</title>
+	<link rel="stylesheet" type="text/css" href="statics/plugins/easyui/css/easyui.css">
+	<script type="text/javascript" src="statics/libs/jquery.min.js"></script>
+	<script type="text/javascript" src="statics/plugins/easyui/js/jquery.easyui.min.js"></script>
+	<script src="statics/plugins/layer/layer.js"></script>
+	<script type="text/javascript" src="statics/libs/util.min.js"></script>
+</head>
+<body>
+	<div class="easyui-panel" style="width:100%;max-width:400px;padding:30px 60px;">
+		<div style="margin-bottom:20px">
+			<input id="province" class="easyui-combobox" name="language" style="width:100%;" data-options="label: '省', labelPosition: 'left', readonly: true">
+			<input id="area" class="easyui-combobox" name="language" style="width:100%;" data-options="label: '市:', labelPosition: 'left', readonly: true">
+			<input id="city" class="easyui-combobox" name="language" style="width:100%;" data-options="label: '区:', labelPosition: 'left', readonly: true">
+		</div>
+	</div>
+	<script type="text/javascript">
+	$(function(){
+		var value = 440000;
+		var returndata = Util.loadData("/app/AreaBaseCodeByNo").data;
+		// 对获取到的数据进行处理
+		// returndata[2].selected='true';
+		
+		// 填充数据到页面
+		$('#province').combobox({
+			readonly: false,
+		    data: returndata,
+		    valueField:'id',
+		    textField:'text',
+		    // 默认选中
+		    value: value,
+		    editable: false,
+			onChange:function(newValue, oldValue){
+				$("#area").combobox("clear");
+		    	var areaData = Util.loadData("/app/AreaBaseCodeByNo",{'no': newValue/* $('#province').combo('getValue') */}).data;
+		    	$("#area").combobox("loadData",areaData);
+		    }
+		});
+		$('#area').combobox({   
+			readonly: false,
+		    editable: false,
+          	valueField:'id',     
+          	textField:'text',
+   			onChange:function(newValue, oldValue){
+   				$("#city").combobox("clear");
+   		    	var areaData = Util.loadData("/app/AreaBaseCodeByNo",{'no': newValue}).data;
+   		    	$("#city").combobox("loadData",areaData);
+   		    }
+         }); 
+		$('#city').combobox({   
+			readonly: false,
+		    editable: false,
+          	valueField:'id',     
+          	textField:'text'
+         }); 
+		if(value){
+	    	var areaData = Util.loadData("/app/AreaBaseCodeByNo",{'no': $('#province').combo('getValue')}).data;
+	    	$("#area").combobox("loadData",areaData);
+		}
+	});
+	</script>
+</body>
+</html>

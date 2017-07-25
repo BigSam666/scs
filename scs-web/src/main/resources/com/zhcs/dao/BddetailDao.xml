@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.BddetailDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.BddetailEntity">
+		select
+			id, 		
+			budget, 		
+			code, 		
+			pcode, 		
+			money,
+			origin, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from bddetail where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.BddetailEntity">
+		select
+			id, 		
+			budget, 		
+			code, 		
+			pcode, 		
+			money, 
+			origin,		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from bddetail 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListByBudget" resultType="com.zhcs.entity.BddetailEntity">
+		select
+			id, 		
+			budget, 		
+			code, 		
+			pcode, 		
+			money, 	
+			origin,	
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from bddetail 
+		where budget = #{budget}
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from bddetail 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.BddetailEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into bddetail
+		(
+			`budget`, 
+			`code`, 
+			`pcode`, 
+			`money`,
+			`origin`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{budget}, 
+			#{code}, 
+			#{pcode}, 
+			#{money}, 
+			#{origin}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+		insert into bddetail
+		(
+			`budget`, 
+			`code`, 
+			`pcode`, 
+			`money`, 
+			`origin`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator="," >
+		(
+			#{item.budget}, 
+			#{item.code}, 
+			#{item.pcode}, 
+			#{item.money}, 
+			#{item.origin}, 
+			#{item.crtid}, 
+			#{item.crttm}, 
+			#{item.updid}, 
+			#{item.updtm}
+		)
+		</foreach>
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.BddetailEntity">
+		update bddetail 
+		<set>
+			<if test="budget != null">`budget` = #{budget}, </if>
+			<if test="code != null">`code` = #{code}, </if>
+			<if test="pcode != null">`pcode` = #{pcode}, </if>
+			<if test="money != null">`money` = #{money}, </if>
+			<if test="origin != null">`origin` = #{origin}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from bddetail where id = #{value}
+	</delete>
+	
+	<delete id="deleteNyBudget">
+		delete from bddetail where budget = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from bddetail where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.PartyDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.PartyEntity">
+		select
+			id, 		
+			nm, 		
+			contperson, 		
+			rmk, 		
+			phone, 		
+			addr, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from party where id = #{value}
+	</select>
+	
+</mapper>

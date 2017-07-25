@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>部门</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList && !showTree">
+		<div class="grid-btn">
+			<a class="btn btn-primary" @click="showTreeD">部门树</a>
+			#if($shiro.hasPermission("department:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			<script type="text/javascript">
+				var update = false;
+				var del = false;
+			</script>
+			#if($shiro.hasPermission("department:update"))
+			<script type="text/javascript">
+				update=true;
+			</script>
+			#end
+			#if($shiro.hasPermission("department:delete"))
+			<script type="text/javascript">
+				del=true;
+			</script>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList && !showTree" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+								<div class="form-group">
+			   	<div class="col-sm-2 control-label">上级部门</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" style="cursor:pointer;" v-model="department.pnm" @click="deptTree" readonly="readonly" placeholder="company"/>
+			    </div>
+			</div>
+						<div class="form-group">
+			   	<div class="col-sm-2 control-label">部门名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="department.name" placeholder="部门名称"/>
+			    </div>
+			</div>
+						<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否有效</div>
+			   	<div class="col-sm-10">
+					<label class="radio-inline">
+					  <input type="radio" name="valid" value="0" v-model="department.valid"/> 无效
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="valid" value="1" v-model="department.valid"/> 有效
+					</label>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">排序号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="department.sort" placeholder="排序号"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">组织类型</div>
+			   	<div class="col-sm-10">
+		      		<input id="otype" class="easyui-combobox" name="otype">
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">责任人</div>
+			   	<div class="col-sm-10">
+		      		<input type="hidden" v-model="department.pesponsible" />
+		      		<input type="text" class="form-control" style="cursor:pointer;" name="pname" @click="pnameTree" readonly="readonly" placeholder="责任人"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">备注</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="department.rmk" placeholder="备注"/>
+			    </div>
+			</div>
+			
+			#if($shiro.hasPermission("department:save") || $shiro.hasPermission("department:update"))
+			<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" v-show="upd" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+			#end
+		</form>
+	</div>
+	<div v-show="showTree" class="panel panel-default">
+		<div class="panel-heading"><a @click="reload" style="cursor:pointer;" >返回列表</a>&nbsp;&nbsp;部门树</div>
+		<div id="deptLayer2" style="padding:10px;">
+			<ul id="deptTree2" class="ztree"></ul>
+		</div>
+	</div>
+</div>
+
+<!-- 部门菜单 -->
+<div id="deptLayer" style="display: none;padding:10px;">
+	<ul id="deptTree" class="ztree"></ul>
+</div>
+<!-- 选择责任人 -->
+<div id="pnameLayer" style="display: none;padding:10px;">
+	<ul id="pTree" class="ztree"></ul>
+</div>
+
+<script src="${rc.contextPath}/js/sys/department.js?_${date.systemTime}"></script>
+</body>
+</html>

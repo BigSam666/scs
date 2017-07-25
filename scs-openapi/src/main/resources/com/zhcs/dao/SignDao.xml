@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.SignDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.SignEntity">
+		select
+			id, 		
+			signImg, 		
+			content, 		
+			length, 		
+			width, 		
+			height, 		
+			nature, 		
+			type, 		
+			light, 		
+			term, 		
+			province, 		
+			city, 		
+			county, 		
+			dtlAddress, 		
+			unm, 		
+			mobile, 		
+			unit, 		
+			blcs, 		
+			openId, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sign where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.SignEntity">
+		select
+			id, 		
+			signImg, 		
+			content, 		
+			length, 		
+			width, 		
+			height, 		
+			nature, 		
+			type, 		
+			light, 		
+			term, 		
+			province, 		
+			city, 		
+			county, 		
+			dtlAddress, 		
+			unm, 		
+			mobile, 		
+			unit, 		
+			blcs, 		
+			openId, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from sign 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from sign 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.SignEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into sign
+		(
+			`signImg`, 
+			`content`, 
+			`length`, 
+			`width`, 
+			`height`, 
+			`nature`, 
+			`type`, 
+			`light`, 
+			`term`, 
+			`province`, 
+			`city`, 
+			`county`, 
+			`dtlAddress`, 
+			`unm`, 
+			`mobile`, 
+			`unit`, 
+			`blcs`, 
+			`openId`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{signimg}, 
+			#{content}, 
+			#{length}, 
+			#{width}, 
+			#{height}, 
+			#{nature}, 
+			#{type}, 
+			#{light}, 
+			#{term}, 
+			#{province}, 
+			#{city}, 
+			#{county}, 
+			#{dtladdress}, 
+			#{unm}, 
+			#{mobile}, 
+			#{unit}, 
+			#{blcs}, 
+			#{openid}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.SignEntity">
+		update sign 
+		<set>
+			<if test="signimg != null">`signImg` = #{signimg}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="length != null">`length` = #{length}, </if>
+			<if test="width != null">`width` = #{width}, </if>
+			<if test="height != null">`height` = #{height}, </if>
+			<if test="nature != null">`nature` = #{nature}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="light != null">`light` = #{light}, </if>
+			<if test="term != null">`term` = #{term}, </if>
+			<if test="province != null">`province` = #{province}, </if>
+			<if test="city != null">`city` = #{city}, </if>
+			<if test="county != null">`county` = #{county}, </if>
+			<if test="dtladdress != null">`dtlAddress` = #{dtladdress}, </if>
+			<if test="unm != null">`unm` = #{unm}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="unit != null">`unit` = #{unit}, </if>
+			<if test="blcs != null">`blcs` = #{blcs}, </if>
+			<if test="openid != null">`openId` = #{openid}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from sign where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from sign where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

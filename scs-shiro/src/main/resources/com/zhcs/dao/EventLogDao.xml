@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.EventLogDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.EventLogEntity">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 	
+			estimatetm,
+			auxiliary,	
+			des, 		
+			dltm, 		
+			current, 		
+			flag, 		
+			next, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event_log where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.EventLogEntity">
+		select
+			id, 		
+			busseg, 		
+			no, 		
+			sour, 		
+			qdescribe, 		
+			lng, 		
+			lat, 		
+			addr, 		
+			qimg, 		
+			handle, 		
+			htm, 		
+			img, 
+			estimatetm,
+			auxiliary,		
+			des, 		
+			dltm, 		
+			current, 		
+			flag, 		
+			next, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from event_log 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="getSpeed" resultType="java.util.Map">
+		select
+			eventlog.des,
+			eventlog.current,
+			eventlog.sour,
+			eventlog.flag,
+			eventlog.qdescribe,
+			eventlog.updtm,
+			eventlog.updid,
+			wf.nodename
+		from
+			event_log eventlog,
+			workflow wf
+		where
+			eventlog.no = #{value}
+		and eventlog.current = wf.nodeno
+		order by
+			eventlog.id desc
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from event_log 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.EventLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into event_log
+		(
+			`busseg`, 
+			`no`, 
+			`sour`, 
+			`qdescribe`, 
+			`lng`, 
+			`lat`, 
+			`addr`, 
+			`qimg`, 
+			`handle`, 
+			`htm`, 
+			`img`, 
+			`estimatetm`,
+			`auxiliary`,
+			`des`, 
+			`dltm`, 
+			`current`, 
+			`flag`, 
+			`next`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{busseg}, 
+			#{no}, 
+			#{sour}, 
+			#{qdescribe}, 
+			#{lng}, 
+			#{lat}, 
+			#{addr}, 
+			#{qimg}, 
+			#{handle}, 
+			#{htm}, 
+			#{img}, 
+			#{estimatetm}, 
+			#{auxiliary}, 
+			#{des}, 
+			#{dltm}, 
+			#{current}, 
+			#{flag}, 
+			#{next}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.EventLogEntity">
+		update event_log 
+		<set>
+			<if test="busseg != null">`busseg` = #{busseg}, </if>
+			<if test="no != null">`no` = #{no}, </if>
+			<if test="sour != null">`sour` = #{sour}, </if>
+			<if test="qdescribe != null">`qdescribe` = #{qdescribe}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="lat != null">`lat` = #{lat}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="qimg != null">`qimg` = #{qimg}, </if>
+			<if test="handle != null">`handle` = #{handle}, </if>
+			<if test="htm != null">`htm` = #{htm}, </if>
+			<if test="img != null">`img` = #{img}, </if>
+			<if test="estimatetm != null">`estimatetm` = #{estimatetm}, </if>
+			<if test="auxiliary != null">`auxiliary` = #{auxiliary}, </if>
+			<if test="des != null">`des` = #{des}, </if>
+			<if test="dltm != null">`dltm` = #{dltm}, </if>
+			<if test="current != null">`current` = #{current}, </if>
+			<if test="flag != null">`flag` = #{flag}, </if>
+			<if test="next != null">`next` = #{next}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from event_log where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from event_log where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

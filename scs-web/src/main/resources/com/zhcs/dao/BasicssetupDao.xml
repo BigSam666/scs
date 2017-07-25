@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zhcs.dao.BasicssetupDao">
+
+	<select id="queryObject" resultType="com.zhcs.entity.BasicssetupEntity">
+		select
+			id, 		
+			setup, 		
+			zdate, 		
+			zrange, 		
+			yrange, 		
+			sdkm, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from basicssetup where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.zhcs.entity.BasicssetupEntity">
+		select
+			id, 		
+			setup, 		
+			zdate, 		
+			zrange, 		
+			yrange, 		
+			sdkm, 		
+			status, 		
+			crtid, 		
+			crttm, 		
+			updid, 		
+			updtm		
+		from basicssetup 
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order} 
+			</when>
+			<otherwise>
+				order by updtm desc 
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from basicssetup 
+	</select>
+	 
+	<insert id="save" parameterType="com.zhcs.entity.BasicssetupEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into basicssetup
+		(
+			`setup`, 
+			`zdate`, 
+			`zrange`, 
+			`yrange`, 
+			`sdkm`, 
+			`status`, 
+			`crtid`, 
+			`crttm`, 
+			`updid`, 
+			`updtm`
+		)
+		values
+		(
+			#{setup}, 
+			#{zdate}, 
+			#{zrange}, 
+			#{yrange}, 
+			#{sdkm}, 
+			#{status}, 
+			#{crtid}, 
+			#{crttm}, 
+			#{updid}, 
+			#{updtm}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.zhcs.entity.BasicssetupEntity">
+		update basicssetup 
+		<set>
+			<if test="setup != null">`setup` = #{setup}, </if>
+			<if test="zdate != null">`zdate` = #{zdate}, </if>
+			<if test="zrange != null">`zrange` = #{zrange}, </if>
+			<if test="yrange != null">`yrange` = #{yrange}, </if>
+			<if test="sdkm != null">`sdkm` = #{sdkm}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from basicssetup where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from basicssetup where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>
