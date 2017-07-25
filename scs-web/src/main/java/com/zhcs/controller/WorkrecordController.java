@@ -49,7 +49,7 @@ public class WorkrecordController extends AbstractController  {
 	@ResponseBody
 	@RequestMapping("/list")
 	@RequiresPermissions("workrecord:list")
-	public R list(String sidx, String order, Integer page, Integer limit, String busseg, String expl){
+	public R list(String sidx, String order, Integer page, Integer limit, String busseg, String expl,String condition){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("sidx", sidx);
 		map.put("busseg", busseg);
@@ -57,6 +57,8 @@ public class WorkrecordController extends AbstractController  {
 		map.put("order", order);
 		map.put("offset", (page - 1) * limit);
 		map.put("limit", limit);
+		
+		map.put("condition", condition);
 		
 		//查询列表数据
 		List<Map<String, Object>> workrecordList = workrecordService.queryList(map);

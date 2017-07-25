@@ -216,7 +216,7 @@ public class ApiUserController {
 			}
 			
 			SysUserEntity user = sysUserService.queryObject(token.getUserId()); // 拿到当前用户
-			String infosource = PlatformContext.getGoalbalContext("infosource", String.class);
+			String infosource = PlatformContext.getGoalbalContext("infosource","1", String.class);
 			
 			feedBackEntity.setPerson(user.getId());
 			feedBackEntity.setInfosource(infosource);

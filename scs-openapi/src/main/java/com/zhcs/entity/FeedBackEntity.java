@@ -44,6 +44,7 @@ public class FeedBackEntity implements Serializable {
 	
 	@ApiModelProperty(required=false, hidden=true)
 	private Long person;
+
 	@ApiModelProperty(required=false, hidden=true)
 	private String infosource;
 	

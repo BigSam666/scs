@@ -19,6 +19,22 @@
 		from citizen where id = #{value}
 	</select>
 
+	<update id="update" parameterType="com.zhcs.entity.CitizenEntity">
+		update citizen
+		<set>
+			<if test="wechatid != null">`wechatid` = #{wechatid}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="nm != null">`nm` = #{nm}, </if>
+			<if test="gender != null">`gender` = #{gender}, </if>
+			<if test="faceimg != null">`faceimg` = #{faceimg}, </if>
+			<if test="addr != null">`addr` = #{addr}, </if>
+			<if test="crtid != null">`crtid` = #{crtid}, </if>
+			<if test="crttm != null">`crttm` = #{crttm}, </if>
+			<if test="updid != null">`updid` = #{updid}, </if>
+			<if test="updtm != null">`updtm` = #{updtm}</if>
+		</set>
+		where id = #{id}
+	</update>
 
 	<select id="queryObjectByWeChatId" resultType="com.zhcs.entity.CitizenEntity">
 		select

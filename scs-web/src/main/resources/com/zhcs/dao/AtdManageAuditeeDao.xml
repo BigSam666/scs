@@ -82,6 +82,10 @@
 			<if test="ids != null and ids != ''">
 				and FIND_IN_SET(sys_user_dept.deptid,#{ids})
 			</if>
+			<if test="condition != null and condition != ''">
+				and sys_user.realname like concat('%',#{condition},'%') 
+			</if>
+			
 		</where>
 		<choose>
 			<when test="sidx != null and sidx.trim() != ''">
@@ -115,6 +119,9 @@
 					<if test="ids != null and ids != ''">
 						and FIND_IN_SET(sys_user_dept.deptid,#{ids})
 					</if>
+					<if test="condition != null and condition != ''">
+				and sys_user.realname like concat('%',#{condition},'%') 
+			</if>
 				</where>
 			) atdManage
 	</select>

@@ -588,7 +588,6 @@ public class EventController extends AbstractController  {
 		String uname = "";
 		SysUserEntity sysuer = null;
 		CitizenEntity citizen = null;
-		PartyEntity party = null; 
 		for (int i = 0 ; i < list.size(); i++) {
 			map = list.get(i);
 			updid = Long.valueOf(StringUtil.valueOf(map.get("updid")));
@@ -610,9 +609,9 @@ public class EventController extends AbstractController  {
 					break;
 				case "2":
 					// 数字化城管
-					party = partyService.queryObject(updid);
-					if(StringUtil.isValid(party)){
-						uname = party.getNm();
+					sysuer = sysUserService.queryObject(updid);
+					if(StringUtil.isValid(sysuer)){
+						uname = sysuer.getRealname();
 					}
 					break;
 				case "3":
@@ -653,7 +652,6 @@ public class EventController extends AbstractController  {
 		String uname = "";
 		SysUserEntity sysuer = null;
 		CitizenEntity citizen = null;
-		PartyEntity party = null; 
 		for (int i = 0 ; i < list.size(); i++) {
 			map = list.get(i);
 			updid = Long.valueOf(StringUtil.valueOf(map.get("updid")));
@@ -674,10 +672,9 @@ public class EventController extends AbstractController  {
 					}
 					break;
 				case "2":
-					// 数字化城管
-					party = partyService.queryObject(updid);
-					if(StringUtil.isValid(party)){
-						uname = party.getNm();
+					sysuer = sysUserService.queryObject(updid);
+					if(StringUtil.isValid(sysuer)){
+						uname = sysuer.getRealname();
 					}
 					break;
 				case "3":

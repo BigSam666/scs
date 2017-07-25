@@ -17,6 +17,9 @@ $(function () {
         colModel: [			
 			// 隐藏主键
 			{ label: '主键id', name: 'id', width: 50, key: true ,hidden : true },
+			{ label: '创建人', name: 'realname', width: 90 }, 
+			{ label: '所属部门', name: 'deptNames', width: 90 }, 
+			
 			{ label: '业务板块', name: 'busseg', width: 50 , formatter: function(value, options, row){
 				return $.isPlainObject(value) ? value.value : value;
 			}},  
@@ -34,8 +37,8 @@ $(function () {
 			}},
 			{ label: '详细地址', name: 'addr', width: 90 }, 
 			{ label: '精确地址', name: 'accaddr', width: 90 }, 
-			{ label: '纬度', name: 'lat', width: 50 }, 
-			{ label: '经度', name: 'lng', width: 50 }, 
+			/*{ label: '纬度', name: 'lat', width: 50 }, 
+			{ label: '经度', name: 'lng', width: 50 }, */
 			{ label: '说明', name: 'expl', width: 100 }, 
 			{ label: '创建时间', name: 'crttm', width: 80 }, 
 			{ label: '操作', name: 'operation', width: 40, formatter: function(value, options, row){
@@ -74,6 +77,9 @@ $(function () {
 var vm = new Vue({
 	el:'#rrapp',
 	data:{
+		q:{
+			condition:''
+		},
 		showList: true,
 		upd: false,
 		title: null,
@@ -215,6 +221,8 @@ var vm = new Vue({
 			vm.showList = true;
 			var page = $("#jqGrid").jqGrid('getGridParam','page');
 			$("#jqGrid").jqGrid('setGridParam',{ 
+				postData:{'condition': vm.q.condition
+				},
                 page:page
             }).trigger("reloadGrid");
 			$(".amap").hide();

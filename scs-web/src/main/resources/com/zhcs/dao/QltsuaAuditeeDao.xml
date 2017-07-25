@@ -86,18 +86,16 @@
 			base_code.cnm AS scoreName,
 			q.stime,
 			q.person,
-			users.`name` AS personName,
+			users.realname AS personName,
 			(
 				SELECT
-					GROUP_CONCAT(sd.`name`)
+					GROUP_CONCAT(sys_department.`name`)
 				FROM
-					sys_user su,
-					sys_user_dept sud,
-					sys_department sd
+					sys_department,
+					sys_user_dept
 				WHERE
-					su.id = q.person
-				AND su.id = sud.userid
-				AND sud.deptid = sd.id
+					sys_department.id = sys_user_dept.deptid
+				AND sys_user_dept.userid = q.person
 			) AS deptName,
 			q.accaddr,
 			q.img,
@@ -116,7 +114,7 @@
 		INNER JOIN sys_user_dept ON sys_user_dept.userid = users.updid
 		<where>
 			<if test="name != null and name != ''">
-				(select su.name from sys_user su where su.id = q.person) = #{name}
+				users.realname like concat('%',#{name},'%')
 			</if>
 			<if test="status != null">
 				and q.status = #{status}
@@ -184,7 +182,7 @@
 				INNER JOIN sys_user_dept ON sys_user_dept.userid = users.updid
 				<where>
 					<if test="name != null and name != ''">
-						(select su.name from sys_user su where su.id = q.person) = #{name}
+						users.realname like concat('%',#{name},'%')
 					</if>
 					<if test="status != null">
 						and q.status = #{status}

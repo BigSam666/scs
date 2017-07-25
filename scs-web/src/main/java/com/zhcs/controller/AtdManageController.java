@@ -48,13 +48,14 @@ public class AtdManageController extends AbstractController  {
 	@ResponseBody
 	@RequestMapping("/list")
 	@RequiresPermissions("atdmanage:list")
-	public R list(String sidx, String order, Integer page, Integer limit){
+	public R list(String sidx, String order, Integer page, Integer limit,String condition){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("sidx", sidx);
 		map.put("order", order);
 		map.put("offset", (page - 1) * limit);
 		map.put("limit", limit);
 
+		map.put("condition", condition);
 		//查询列表数据
 //		List<AtdManageEntity> atdManageList = atdManageService.queryList(map);
 		List<AtdManageEntity> atdManageList = atdManageService.queryList1(map);

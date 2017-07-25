@@ -18,6 +18,17 @@
 <body>
 <div id="rrapp" v-cloak>
 	<div v-show="showList">
+	<fieldset>
+			<legend><i class="fa fa-search"></i>&nbsp;查询条件</legend>
+			<div class="form-group ">
+			   	<div class="col-sm-3">
+					<input type="text" class="form-control" v-model="q.condition" @keyup.enter="query" placeholder="请输入姓名">
+			    </div>
+			   	<div class="col-sm-2">
+					<a class="btn btn-info" @click="query">查询</a>
+			    </div>
+			</div>
+		</fieldset>
 		<div class="grid-btn">
 			#if($shiro.hasPermission("atdmanageauditee:save"))
 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>

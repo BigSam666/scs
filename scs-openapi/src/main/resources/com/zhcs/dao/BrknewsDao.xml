@@ -88,6 +88,11 @@
 		updid,
 		updtm
 		from brknews
+		<where>
+			<if test="id != null ">
+				and updid = id
+			</if>
+		</where>
 		order by updtm desc
 		<if test="offset != null and limit != null">
 			limit #{offset}, #{limit}
@@ -132,7 +137,12 @@
 	</select>
 	
  	<select id="queryTotal" resultType="int">
-		select count(*) from brknews 
+		select count(*) from brknews
+		<where>
+			<if test="id != null">
+				and updid = id
+			</if>
+		</where>
 	</select>
 	 
 	<insert id="save" parameterType="com.zhcs.entity.BrknewsEntity" useGeneratedKeys="true" keyProperty="id">

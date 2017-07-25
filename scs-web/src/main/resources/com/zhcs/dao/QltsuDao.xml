@@ -78,18 +78,17 @@
 			base_code.cnm AS scoreName,
 			q.stime,
 			q.person,
-			users.`name` AS personName,
+			users.realname AS personName,
 			(
 				SELECT
-					GROUP_CONCAT(sd.`name`)
-				FROM
-					sys_user su,
-					sys_user_dept sud,
-					sys_department sd
-				WHERE
-					su.id = q.person
-				AND su.id = sud.userid
-				AND sud.deptid = sd.id
+				GROUP_CONCAT(sys_department. NAME)
+			FROM
+				sys_department,
+				sys_user_dept
+			WHERE
+				sys_department.id = sys_user_dept.deptid
+			AND sys_user_dept.userid =q.person
+					
 			) AS deptName,
 			q.accaddr,
 			q.img,
@@ -108,7 +107,7 @@
 		INNER JOIN sys_user_dept ON sys_user_dept.userid = users.updid
 		<where>
 			<if test="name != null and name != ''">
-				(select su.name from sys_user su where su.id = q.person) = #{name}
+				users.realname like concat('%',#{name},'%')
 			</if>
 			<if test="ids != null and ids != ''">
 				and FIND_IN_SET(sys_user_dept.deptid,#{ids})
@@ -145,17 +144,16 @@
 					q.person,
 					users.`name` AS personName,
 					(
-						SELECT
-							GROUP_CONCAT(sd.`name`)
-						FROM
-							sys_user su,
-							sys_user_dept sud,
-							sys_department sd
-						WHERE
-							su.id = q.person
-						AND su.id = sud.userid
-						AND sud.deptid = sd.id
-					) AS deptName,
+				SELECT
+				GROUP_CONCAT(sys_department. NAME)
+			FROM
+				sys_department,
+				sys_user_dept
+			WHERE
+				sys_department.id = sys_user_dept.deptid
+			AND sys_user_dept.userid =q.person
+					
+			) AS deptName,
 					q.accaddr,
 					q.img,
 					q.expl,
@@ -173,7 +171,7 @@
 				INNER JOIN sys_user_dept ON sys_user_dept.userid = users.updid
 				<where>
 					<if test="name != null and name != ''">
-						(select su.name from sys_user su where su.id = q.person) = #{name}
+						users.realname like concat('%',#{name},'%')
 					</if>
 					<if test="ids != null and ids != ''">
 						and FIND_IN_SET(sys_user_dept.deptid,#{ids})

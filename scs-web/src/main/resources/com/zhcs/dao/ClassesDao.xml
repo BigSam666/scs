@@ -92,7 +92,11 @@
 				and FIND_IN_SET(classes.pjdept,#{ids})
 			</if>
 			<if test="name != null and name != ''">
-				and concat_ws(',',(SELECT name FROM sys_department WHERE id = pjdept), (SELECT realname FROM sys_user WHERE id = crtid)) like concat('%',#{name},'%') 
+				and (
+					concat_ws(',',(SELECT name FROM sys_department WHERE id = pjdept), (SELECT realname FROM sys_user WHERE id = crtid)) like concat('%',#{name},'%') 
+					or sys_user.realname like concat('%',#{name},'%')
+				) 
+				
 			</if>
 		</where>
 		<choose>
@@ -120,7 +124,11 @@
 				and FIND_IN_SET(classes.pjdept,#{ids})
 			</if>
 			<if test="name != null and name != ''">
-				and concat_ws(',',(SELECT name FROM sys_department WHERE id = pjdept), (SELECT realname FROM sys_user WHERE id = crtid)) like concat('%',#{name},'%') 
+				and (
+					concat_ws(',',(SELECT name FROM sys_department WHERE id = pjdept), (SELECT realname FROM sys_user WHERE id = crtid)) like concat('%',#{name},'%') 
+					or sys_user.realname like concat('%',#{name},'%')
+				) 
+				
 			</if>
 		</where>
 	</select>

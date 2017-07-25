@@ -24,4 +24,9 @@ public class CitizenServiceImpl implements CitizenService {
 	public CitizenEntity queryObjectByWeChatId(String weChatId) {
 		return citizenDao.queryObjectByWeChatId(weChatId);
 	}
+
+	@Override
+	public CitizenEntity update(CitizenEntity citizen) {
+		return citizenDao.update(citizen);
+	}
 }

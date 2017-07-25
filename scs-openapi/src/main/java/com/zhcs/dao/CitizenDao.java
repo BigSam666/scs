@@ -9,4 +9,6 @@ public interface CitizenDao {
 	CitizenEntity queryObject(Long updid);
 
 	CitizenEntity queryObjectByWeChatId(String weChatId);
+
+	CitizenEntity update(CitizenEntity citizen);
 }

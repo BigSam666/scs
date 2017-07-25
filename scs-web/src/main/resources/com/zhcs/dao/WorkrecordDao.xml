@@ -50,19 +50,32 @@
 
 	<select id="queryList2" resultType="java.util.Map">
 		select
-			id, 		
-			busseg, 		
-			img, 		
-			addr, 	
-			accaddr,	
-			lat, 		
-			lng, 		
-			expl, 		
-			crtid, 		
-			crttm, 		
-			updid, 		
-			updtm		
-		from workRecord 
+			workRecord.id, 		
+			workRecord.busseg, 		
+			workRecord.img, 		
+			workRecord.addr, 	
+			workRecord.accaddr,	
+			workRecord.lat, 		
+			workRecord.lng, 		
+			workRecord.expl, 		
+			workRecord.crtid, 		
+			workRecord.crttm, 		
+			workRecord.updid, 		
+			workRecord.updtm,
+			(
+			SELECT
+				GROUP_CONCAT(sys_department. NAME)
+				FROM
+					sys_department,
+					sys_user_dept
+				WHERE
+					sys_department.id = sys_user_dept.deptid
+					AND sys_user_dept.userid = workRecord.crtid
+
+			) AS deptNames,
+			sys_user.realname	
+			from workRecord 
+			LEFT JOIN sys_user on sys_user.id = workRecord.crtid
 		<where>
 			<if test="busseg != null and busseg.trim() != ''">
 				and busseg = #{busseg}
@@ -70,6 +83,23 @@
 			<if test="expl != null and expl.trim() != ''">
 				and expl like concat('%',#{expl},'%') 
 			</if>
+			 
+			<if test="condition != null and condition != ''">
+				and (
+						workRecord.crtid in (SELECT sys_user_dept.userid
+						FROM
+							sys_department,
+							sys_user_dept
+						WHERE
+							sys_department.id = sys_user_dept.deptid
+						AND sys_user_dept.userid = workRecord.crtid
+					and sys_department.`name` like concat('%',#{condition},'%') ) 
+					OR 
+				
+					sys_user.realname like concat('%',#{condition},'%') 
+						)
+			</if>
+			
 		</where>
 		<choose>
 			<when test="sidx != null and sidx.trim() != ''">
@@ -86,6 +116,32 @@
 	
  	<select id="queryTotal" resultType="int">
 		select count(*) from workRecord 
+			LEFT JOIN sys_user on sys_user.id = workRecord.crtid
+		<where>
+			<if test="busseg != null and busseg.trim() != ''">
+				and busseg = #{busseg}
+			</if>
+			<if test="expl != null and expl.trim() != ''">
+				and expl like concat('%',#{expl},'%') 
+			</if>
+			 
+			<if test="condition != null and condition != ''">
+				and (
+						workRecord.crtid in (SELECT sys_user_dept.userid
+						FROM
+							sys_department,
+							sys_user_dept
+						WHERE
+							sys_department.id = sys_user_dept.deptid
+						AND sys_user_dept.userid = workRecord.crtid
+					and sys_department.`name` like concat('%',#{condition},'%') ) 
+					OR 
+				
+					sys_user.realname like concat('%',#{condition},'%') 
+						)
+			</if>
+			
+		</where>
 	</select>
 	 
 	<insert id="save" parameterType="com.zhcs.entity.WorkrecordEntity" useGeneratedKeys="true" keyProperty="id">

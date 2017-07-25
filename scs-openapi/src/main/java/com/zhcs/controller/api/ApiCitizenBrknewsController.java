@@ -28,6 +28,10 @@ public class ApiCitizenBrknewsController {
 	private CitizenService citizenService;
 	@Autowired
 	private SerianoService serianoService;
+    @Autowired
+    private BaseCodeService baseCodeService;
+    @Autowired
+    private SysUserService sysUserService;
 	@Autowired
 	private EventService eventService;
 	@Autowired
@@ -44,7 +48,7 @@ public class ApiCitizenBrknewsController {
 			CitizenEntity citizen = citizenService.queryObjectByWeChatId(brknewsReport.getOpenId());
 			if (StringUtil.isValid(citizen)) {
 				String caseno = serianoService.getId("event.no", DateUtil.getSystemDateStr("yyyyMM"));
-				String current = PlatformContext.getGoalbalContext("bn", "bl", String.class);
+				String current = PlatformContext.getGoalbalContext("bn", "bl", String .class);
 				WorkflowEntity we = workflowService.queryOtherNodeObject(current, "1");
 				Long userId = citizen.getId();
 
@@ -74,6 +78,7 @@ public class ApiCitizenBrknewsController {
 				eventlog.setFlag("1");
 				BeanUtil.fillCCUUD(eventlog, userId, userId);
 				eventLogService.save(eventlog);
+
 				// 保存当前信息
 				EventEntity event = new EventEntity();
 				event.setAddr(brknewsEntity.getAdds());
@@ -120,5 +125,109 @@ public class ApiCitizenBrknewsController {
 			return R.error(60000, "openId无效");
 		}
 	}
+
+    @ApiOperation(value = "获取我的爆料列表" , notes = "获取我的爆料列表")
+    @RequestMapping(value = "/getListByMe" , method = RequestMethod.POST)
+    @ResponseBody
+    public R getListByMe(@RequestBody CitizenPageEntity citizenPage){
+        // 检查openId是否在我们市民关注列表，不在表示无效
+        if (StringUtil.isValid(citizenPage.getOpenId())) {
+            CitizenEntity citizen = citizenService.queryObjectByWeChatId(citizenPage.getOpenId());
+            if (StringUtil.isValid(citizen)) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("offset", (citizenPage.getPage() - 1) * citizenPage.getPageSize());
+                map.put("limit", citizenPage.getPageSize());
+                map.put("id", citizen.getId());
+                //查询列表数据
+                List<Map<String, Object>> brknewsList = brknewsService.queryList2(map);
+
+                int total = brknewsService.queryTotal(map);
+                PageUtils pageUtil = new PageUtils(brknewsList, total, citizenPage.getPageSize(), citizenPage.getPage());
+                return R.ok().putData(pageUtil);
+            } else {
+                return R.error(60000, "openId无效");
+            }
+        } else {
+            return R.error(60000, "openId无效");
+        }
+    }
+
+	@ApiOperation(value = "获取爆料详情" , notes = "获取爆料详情")
+	@RequestMapping(value = "/getDetails" , method = RequestMethod.POST)
+	@ResponseBody
+	public R getDetails(@RequestBody BrknewsDetailEntity brknewsDetailEntity){
+		// 检查openId是否在我们市民关注列表，不在表示无效
+		if (StringUtil.isValid(brknewsDetailEntity.getOpenId())) {
+			CitizenEntity citizen = citizenService.queryObjectByWeChatId(brknewsDetailEntity.getOpenId());
+			if (StringUtil.isValid(citizen)) {
+				BrknewsEntity br = brknewsService.queryObject(brknewsDetailEntity.getId());
+				return  R.ok().putData(br);
+			} else {
+				return R.error(60000, "openId无效");
+			}
+		} else {
+			return R.error(60000, "openId无效");
+		}
+	}
+
+    @ApiOperation(value = "获取案件处理进度" , notes = "获取案件处理进度")
+    @RequestMapping(value = "/getSpeed/{caseNo}", method = RequestMethod.GET)
+    @ResponseBody
+    public R getSpeed(@PathVariable("caseNo") String caseNo){
+        List<Map<String, Object>> list = eventLogService.getSpeed(caseNo);
+        Map<String, Object> map = null;
+        Long updid = 0L;
+        String uname = "";
+        SysUserEntity sysuer = null;
+        CitizenEntity citizen = null;
+        for (int i = 0 ; i < list.size(); i++) {
+            map = list.get(i);
+            updid = Long.valueOf(StringUtil.valueOf(map.get("updid")));
+            if(i == list.size() - 1){
+                switch (StringUtil.valueOf(map.get("sour"))) {
+                    case "0":
+                        // 市民爆料
+                        citizen = citizenService.queryObject(updid);
+                        if(StringUtil.isValid(citizen)){
+                            uname = citizen.getNm();
+                        }
+                        break;
+                    case "1":
+                        // 领导爆料
+                        sysuer = sysUserService.queryObject(updid);
+                        if(StringUtil.isValid(sysuer)){
+                            uname = sysuer.getRealname();
+                        }
+                        break;
+                    case "2":
+                        // 数字化城管
+                        sysuer = sysUserService.queryObject(updid);
+                        if(StringUtil.isValid(sysuer)){
+                            uname = sysuer.getRealname();
+                        }
+                        break;
+                    case "3":
+                        // 员工爆料
+                        sysuer = sysUserService.queryObject(updid);
+                        if(StringUtil.isValid(sysuer)){
+                            uname = sysuer.getRealname();
+                        }
+                        break;
+                    case "4":
+                        uname = "呼叫工单";
+                        break;
+                }
+            } else {
+                sysuer = sysUserService.queryObject(updid);
+                if(StringUtil.isValid(sysuer)){
+                    uname = sysuer.getRealname();
+                } else {
+                    uname = "未知";
+                }
+            }
+            map.put("uname", uname);
+        }
+        return R.ok().put("speedList", list);
+    }
 
 }

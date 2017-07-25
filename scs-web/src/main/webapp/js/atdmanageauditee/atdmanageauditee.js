@@ -96,6 +96,7 @@ var settingPerson = {
 var vm = new Vue({
 	el:'#rrapp',
 	data:{
+		q:{condition:''},
 		showFirstGroupTime:false, // 是否显示第一组时间
 		showSecondGroupTime: false, // 是否显示第二组时间
 		isleave:false, // 是否显示请假的类型（事假、病假...）
@@ -336,6 +337,8 @@ var vm = new Vue({
 			vm.showList = true;
 			var page = $("#jqGrid").jqGrid('getGridParam','page');
 			$("#jqGrid").jqGrid('setGridParam',{ 
+				postData:{'condition': vm.q.condition
+				},
                 page:page
             }).trigger("reloadGrid");
 		}
